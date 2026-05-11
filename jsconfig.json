@@ -1,0 +1,8 @@
+{
+	"extends": "../../jsconfig.json",
+	"include": [
+		"plugin.js",
+		"../../.sdk/types.d.ts",
+		"../../.sdk/asset-types.d.ts"
+	]
+}

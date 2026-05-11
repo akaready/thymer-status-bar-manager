@@ -1,0 +1,36 @@
+{
+	"ver": 1,
+	"name": "Status Bar Manager",
+	"icon": "adjustments",
+	"description": "Show or hide individual elements of Thymer's bottom status bar — the bar itself, keyboard shortcuts, plugin icons, the user avatar, the Thymer logo, and the sync indicator.",
+	"author": "@akaready",
+	"homepage": "https://akaready.com",
+	"repository": "https://github.com/akaready/thymer-status-bar-manager",
+	"coffee": "https://buymeacoffee.com/akaready",
+	"custom": {
+		"schemaVersion": 1,
+		"state": {
+			"spacing": 0,
+			"iconOnlyPlugins": false,
+			"iconOnlyShortcuts": false,
+			"uniformHover": true,
+			"splitHoverZones": false,
+			"overrideTooltips": false,
+			"triggerIcon": "adjustments",
+			"triggerYOffset": 0,
+			"tooltipOverrides": {},
+			"modes": {
+				"shortcuts": "show",
+				"markdownMirror": "show",
+				"mcpBridge": "show",
+				"hotReload": "show",
+				"thymer": "show",
+				"user": "show",
+				"statusMsg": "show",
+				"sync": "show",
+				"__trigger__": "show"
+			},
+			"order": {}
+		}
+	}
+}

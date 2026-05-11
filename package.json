@@ -1,0 +1,13 @@
+{
+	"name": "status-bar-manager",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"description": "Show or hide individual elements of Thymer's bottom status bar.",
+	"scripts": {
+		"dev": "node ../../.sdk/dev.js",
+		"dev:verbose": "node ../../.sdk/dev.js --print-code",
+		"build": "node ../../scripts/build-paste-ready.mjs",
+		"build:bundle": "node ../../.sdk/dev.js --once"
+	}
+}
