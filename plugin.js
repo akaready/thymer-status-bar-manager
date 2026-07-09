@@ -1,0 +1,3661 @@
+"use strict";
+var plugins = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // plugin.js
+  var plugin_exports = {};
+  __export(plugin_exports, {
+    Plugin: () => Plugin
+  });
+
+  // ../../shared/settings-ui/tokens.css
+  var tokens_default = "/*\n * Thymer Plugin Settings UI \u2014 Design Tokens\n *\n * Canonical CSS custom properties for the plugin settings panel system.\n * Plugins consume this verbatim; component CSS reads from these vars.\n *\n * See shared/settings-ui/DESIGN.md for rationale.\n *\n * Thymer var names verified against library/css-tokens/ (ripped from shipped CSS).\n * Fallbacks use color-mix(currentColor) so panels work when a token is absent.\n */\n\n.tps-panel {\n  /* \u2500\u2500 Color: text \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-text:           var(--text-default,   currentColor);\n  --tps-text-muted:     var(--text-muted,     color-mix(in srgb, currentColor 62%, transparent));\n  --tps-text-faint:     var(--text-subtle,    color-mix(in srgb, currentColor 48%, transparent));\n  --tps-text-whisper:   var(--text-disabled,  color-mix(in srgb, currentColor 34%, transparent));\n\n  /* \u2500\u2500 Color: surfaces \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-bg-input:       var(--input-bg-color,\n                        color-mix(in srgb, currentColor 6%, transparent));\n  --tps-bg-hover:       var(--hover-subtle,\n                        var(--sidebar-bg-hover,\n                        color-mix(in srgb, currentColor 8%, transparent)));\n  --tps-bg-active:      var(--active-bg-color,\n                        color-mix(in srgb, currentColor 12%, transparent));\n\n  /* \u2500\u2500 Color: borders / dividers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-divider:        var(--divider-color,\n                        var(--thin-divider-color,\n                        color-mix(in srgb, currentColor 14%, transparent)));\n  --tps-border:         var(--input-border-color,\n                        var(--divider-color,\n                        color-mix(in srgb, currentColor 22%, transparent)));\n  --tps-border-strong:  var(--titlebar-border-color,\n                        var(--selection-border,\n                        color-mix(in srgb, currentColor 32%, transparent)));\n\n  /* \u2500\u2500 Color: accent (Thymer uses --logo-color) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-accent:         var(--logo-color, currentColor);\n  --tps-accent-soft:    color-mix(in srgb, var(--tps-accent) 15%, transparent);\n  --tps-accent-strong:  color-mix(in srgb, var(--tps-accent) 80%, var(--tps-text));\n\n  /* \u2500\u2500 Color: semantic \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-danger:         var(--enum-red-fg, #ef4444);\n  --tps-danger-soft:    color-mix(in srgb, var(--tps-danger) 15%, transparent);\n  --tps-warning:        var(--text-warning,\n                        var(--enum-yellow-fg, #f59e0b));\n  --tps-success:        var(--enum-green-fg, #10b981);\n  --tps-success-soft:   color-mix(in srgb, var(--tps-success) 12%, transparent);\n\n  --tps-on-accent:      var(--text-on-accent, light-dark(#111111, #fafafa));\n\n  /* Panel chrome */\n  --tps-panel-bg:       var(--panel-bg-color, transparent);\n  --tps-swatch-inset:   color-mix(in srgb, var(--tps-text) 8%, transparent);\n\n  /* \u2500\u2500 Typography \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  /* Font is INHERITED from Thymer's panel chrome (see components.css). */\n\n  --tps-fs-title:       18px;\n  --tps-fs-lede:        13px;\n  --tps-fs-section:     11px;\n  --tps-fs-hint:        12px;\n  --tps-fs-label:       13px;\n  --tps-fs-desc:        12px;\n  --tps-fs-body:        13px;\n  --tps-fs-value:       12px;\n  --tps-fs-button:      12px;\n  --tps-fs-list-header: 10px;\n\n  --tps-lh-tight:       1;\n  --tps-lh-snug:        1.2;\n  --tps-lh-base:        1.4;\n  --tps-lh-loose:       1.5;\n\n  --tps-fw-regular:     400;\n  --tps-fw-medium:      500;\n  --tps-fw-semibold:    600;\n  --tps-fw-bold:        700;\n\n  --tps-ls-section:     0.06em;\n  --tps-ls-list:        0.08em;\n  --tps-ls-title:       0;\n\n  /* \u2500\u2500 Spacing (8px scale) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-space-1:        4px;\n  --tps-space-2:        8px;\n  --tps-space-3:        12px;\n  --tps-space-4:        16px;\n  --tps-space-5:        24px;\n  --tps-space-6:        32px;\n  --tps-space-7:        48px;\n\n  /* \u2500\u2500 Radii \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-radius-sm:      4px;\n  --tps-radius-md:      6px;\n  --tps-radius-lg:      8px;\n  --tps-radius-pill:    999px;\n  --tps-radius-circle:  50%;\n\n  /* \u2500\u2500 Motion \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-ease-out:       cubic-bezier(0.2, 0.6, 0.2, 1);\n  --tps-ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);\n  --tps-dur-fast:       80ms;\n  --tps-dur-base:       160ms;\n\n  --tps-shadow-thumb:   0 1px 3px color-mix(in srgb, var(--tps-text) 28%, transparent);\n\n  /* \u2500\u2500 Component dimensions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */\n  --tps-control-h-sm:   28px;\n  --tps-control-h-md:   32px;\n  --tps-input-w:        64px;\n  --tps-num-step-w:     28px;\n  --tps-swatch-size:    22px;\n  --tps-thumb-size:     16px;\n  --tps-track-h:        6px;\n\n  --tps-slider-track:   color-mix(in srgb, var(--tps-text) 22%, transparent);\n  --tps-slider-thumb-border: color-mix(in srgb, var(--tps-text) 28%, transparent);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .tps-panel {\n    --tps-dur-fast:     1ms;\n    --tps-dur-base:     1ms;\n  }\n}\n";
+
+  // ../../shared/settings-ui/components.css
+  var components_default = `/*
+ * Thymer Plugin Panel \u2014 Component Primitives
+ *
+ * All primitives scope under .tps-panel. Plugin-specific styles live elsewhere.
+ * Reads tokens from tokens.css.
+ */
+
+/* \u2500\u2500 Panel root \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+/* Inherit Thymer's font + sizing \u2014 DO NOT override. plugin-collection-icons
+   demonstrates the right approach: simply \`font-family: inherit\`. Forcing a
+   custom var fights both Thymer's body font AND the .ti icon font. */
+.tps-panel {
+  font-family: inherit;
+  font-size: var(--tps-fs-body);
+  line-height: var(--tps-lh-base);
+  color: var(--tps-text);
+  padding: 0 var(--tps-space-5) var(--tps-space-7);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.tps-panel *,
+.tps-panel *::before,
+.tps-panel *::after {
+  box-sizing: border-box;
+}
+
+/* Mono opt-ins are explicit per-element, never via a panel-wide override. */
+.tps-panel .tps-num-input,
+.tps-panel .tps-slider-value,
+.tps-panel .tps-mono,
+.tps-panel .tps-mono * {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+}
+
+/* \u2500\u2500 Title block \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-title {
+  font-size: var(--tps-fs-title);
+  line-height: var(--tps-lh-snug);
+  font-weight: var(--tps-fw-semibold);
+  letter-spacing: var(--tps-ls-title);
+  color: var(--tps-text);
+  margin: 0 0 var(--tps-space-1);
+}
+
+.tps-lede {
+  font-size: var(--tps-fs-lede);
+  line-height: var(--tps-lh-loose);
+  color: var(--tps-text-muted);
+  margin: 0 0 var(--tps-space-3);
+}
+
+/* \u2500\u2500 Canonical plugin header \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-plugin-header {
+  position: relative;
+  margin: var(--tps-space-5) 0 var(--tps-space-5);
+  padding: 18px var(--tps-space-4);
+  overflow: hidden;
+  background:
+    linear-gradient(to right,
+      #f26548  8%, #f26548 28%,
+      #fbac56 28%, #fbac56 48%,
+      #fff460 48%, #fff460 68%,
+      #f067a6 68%, #f067a6 88%,
+      #03bdf2 88%
+    ) top left / 100% 1px no-repeat,
+    linear-gradient(to right,
+      #f26548  0%, #f26548 12%,
+      #fbac56 12%, #fbac56 32%,
+      #fff460 32%, #fff460 52%,
+      #f067a6 52%, #f067a6 72%,
+      #03bdf2 72%, #03bdf2 92%
+    ) bottom left / 100% 1px no-repeat,
+    var(--tps-panel-bg, var(--panel-bg-color, var(--plg-ci-theme-bg, transparent)));
+  border-left: 1px solid #f26548;
+  border-right: 1px solid #03bdf2;
+}
+
+.tps-plugin-header-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--tps-space-2, 8px);
+  margin: 0 0 var(--tps-space-3, 12px);
+  background: var(--tps-bg-hover);
+  border-radius: var(--tps-radius-md, 6px);
+}
+
+.tps-plugin-header-logo-icon {
+  flex: 0 0 auto;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--tps-text, currentColor);
+}
+
+.tps-plugin-header-title {
+  font-size: 22px;
+  line-height: var(--tps-lh-snug, 1.2);
+  font-weight: var(--tps-fw-semibold, 600);
+  letter-spacing: 0;
+  color: var(--tps-text, var(--text-default, currentColor));
+  margin: 0 0 var(--tps-space-3, 12px);
+}
+
+.tps-plugin-header-version {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  align-self: baseline;
+  font-size: 11px;
+  line-height: inherit;
+  font-weight: var(--tps-fw-medium, 500);
+  letter-spacing: 0;
+  color: var(--tps-text-faint) !important;
+  white-space: nowrap;
+}
+
+.tps-plugin-header-lede {
+  font-size: 14px;
+  line-height: var(--tps-lh-base, 1.4);
+  color: var(--tps-text-muted);
+  margin: 0 0 var(--tps-space-3, 12px);
+}
+
+.tps-plugin-header-helper-wrap {
+  margin: 0 0 var(--tps-space-3, 12px);
+}
+
+.tps-plugin-header-helper-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.28;
+  font: inherit;
+  font-size: var(--tps-fs-section, 11px);
+  font-weight: var(--tps-fw-semibold, 600);
+  line-height: var(--tps-lh-tight, 1);
+  letter-spacing: var(--tps-ls-section, 0.06em);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease-out);
+}
+
+.tps-plugin-header-helper-toggle:hover {
+  opacity: 0.72;
+}
+
+.tps-plugin-header-helper-toggle:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--tps-accent, currentColor) 45%, transparent);
+  outline-offset: 2px;
+}
+
+.tps-plugin-header-helper-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+  line-height: 1;
+  color: inherit;
+}
+
+.tps-plugin-header-helper-wrap[data-open="true"] .tps-plugin-header-helper-toggle {
+  opacity: 0.72;
+}
+
+.tps-plugin-header-helper-wrap[data-open="true"] .tps-plugin-header-helper-toggle:hover {
+  opacity: 1;
+}
+
+.tps-plugin-header-helper-body {
+  display: none;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.tps-plugin-header-helper-wrap[data-open="true"] .tps-plugin-header-helper-body {
+  display: block;
+  cursor: pointer;
+}
+
+.tps-plugin-header-helper-line {
+  margin: 0;
+  font-size: var(--tps-fs-hint, 12px);
+  line-height: var(--tps-lh-base, 1.4);
+  color: inherit;
+  opacity: 0.72;
+  transition: opacity var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease-out);
+}
+
+.tps-plugin-header-helper-wrap[data-open="true"] .tps-plugin-header-helper-body:hover .tps-plugin-header-helper-line {
+  opacity: 1;
+}
+
+.tps-plugin-header-attr {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0;
+  width: 100%;
+  font-size: 11.5px;
+  line-height: var(--tps-lh-base, 1.4);
+  color: var(--tps-text-muted);
+  margin: var(--tps-space-3, 12px) 0 0;
+  padding-top: var(--tps-space-3, 12px);
+  border-top: 0;
+}
+
+.tps-plugin-header-attr::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(40%, 50%, 55%);
+  height: 1px;
+  background: var(--tps-bg-hover);
+}
+
+.tps-plugin-header-link-group + .tps-plugin-header-link-group {
+  margin-left: var(--tps-space-3, 12px);
+  padding-left: var(--tps-space-3, 12px);
+  border-left: 1px solid var(--tps-bg-hover);
+}
+
+.tps-plugin-header-icon,
+.tps-plugin-header-attr .ti {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--tps-text-muted);
+  transform: translateY(2px);
+}
+
+.tps-plugin-header-iconify {
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.tps-plugin-header-iconify-github {
+  --tps-iconify-github: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--tps-iconify-github);
+  mask-image: var(--tps-iconify-github);
+}
+
+.tps-plugin-header-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 42%, transparent);
+  transition: color var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease-out),
+              text-decoration-color var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease-out),
+              filter var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease-out);
+}
+
+.tps-plugin-header-link--blue,
+.tps-plugin-header-link--blue:hover {
+  color: #03bdf2;
+  text-decoration-color: #03bdf2;
+}
+
+.tps-plugin-header-link--pink,
+.tps-plugin-header-link--pink:hover {
+  color: #f067a6;
+  text-decoration-color: #f067a6;
+}
+
+.tps-plugin-header-link--muted,
+.tps-plugin-header-link--muted:hover {
+  color: var(--tps-text-faint) !important;
+  text-decoration-color: color-mix(in srgb, currentColor 42%, transparent);
+}
+
+.tps-plugin-header-link:hover {
+  text-decoration: none;
+  text-decoration-color: transparent;
+  filter: brightness(1.2);
+}
+
+/* \u2500\u2500 Section \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-section {
+  padding: 0;
+}
+
+.tps-section + .tps-section {
+  border-top: 1px solid var(--tps-divider);
+  margin-top: var(--tps-space-4);
+  padding-top: var(--tps-space-4);
+}
+
+.tps-section-label {
+  display: block;
+  font-size: var(--tps-fs-section);
+  line-height: var(--tps-lh-tight);
+  font-weight: var(--tps-fw-semibold);
+  letter-spacing: var(--tps-ls-section);
+  text-transform: uppercase;
+  color: var(--tps-text-muted);
+  margin: 0 0 var(--tps-space-2);
+}
+
+.tps-section-hint {
+  font-size: var(--tps-fs-hint);
+  line-height: var(--tps-lh-base);
+  color: var(--tps-text-muted);
+  margin: 0 0 var(--tps-space-3);
+}
+
+.tps-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tps-space-3);
+  margin-top: var(--tps-space-2);
+}
+
+.tps-section-body:first-child {
+  margin-top: 0;
+}
+
+/* When the body is full of list rows (mode rows), drop the gap and the top
+   margin entirely so the first row's hover background sits flush under the
+   section label and adjacent rows tile with no dead space between them. */
+.tps-section-body:has(> .tps-list-row),
+.tps-section-body:has(> .tps-opt) {
+  margin-top: 0;
+  gap: 0;
+}
+
+/* Collapsible variant: header is a button, body is hidden when closed */
+
+.tps-section--collapsible > .tps-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--tps-space-2);
+  width: 100%;
+  min-height: 34px;
+  padding: 0;
+  margin: 0 0 var(--tps-space-2);
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tps-section--collapsible > .tps-section-header:hover .tps-section-label {
+  color: var(--tps-text);
+}
+
+.tps-section--collapsible > .tps-section-header .tps-section-label {
+  margin: 0;
+}
+
+.tps-section-chev {
+  display: inline-block;
+  width: 10px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--tps-text-faint);
+  transition: transform var(--tps-dur-base) var(--tps-ease-out);
+}
+
+.tps-section--collapsible[data-open="true"] .tps-section-chev {
+  transform: rotate(90deg);
+}
+
+.tps-section-summary {
+  margin-left: auto;
+  min-width: 0;
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: var(--tps-fs-hint);
+  color: var(--tps-text-muted);
+  font-weight: var(--tps-fw-regular);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Reserve header height when expanded; summary text only shows collapsed */
+.tps-section--collapsible[data-open="true"] .tps-section-summary {
+  visibility: hidden;
+}
+
+.tps-section--collapsible[data-open="false"] > .tps-section-body {
+  display: none;
+}
+
+/* \u2500\u2500 Option row (checkbox / radio + label + desc) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-opt {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: var(--tps-space-3);
+  row-gap: 0;
+  align-items: start;
+  padding: 6px 10px;
+  margin: 0 -10px;
+  border-radius: var(--tps-radius-md);
+  cursor: pointer;
+  transition: background-color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+/* Stack option rows tight so the hover background of one meets the next
+   without a visible gap above. Outer section gap is handled by the section
+   itself, not by spacing between opts. */
+.tps-section-body > .tps-opt + .tps-opt {
+  margin-top: 0;
+}
+.tps-section-body:has(> .tps-opt) {
+  gap: 0;
+}
+
+.tps-opt:hover {
+  background: var(--tps-bg-hover);
+}
+
+.tps-opt > input[type="checkbox"],
+.tps-opt > input[type="radio"] {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--tps-accent);
+  cursor: pointer;
+}
+
+.tps-opt > .tps-opt-label {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: var(--tps-fs-label);
+  line-height: var(--tps-lh-base);
+  font-weight: var(--tps-fw-medium);
+  color: var(--tps-text);
+  cursor: pointer;
+  transition: color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-opt > .tps-opt-desc {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 1px;
+  font-size: var(--tps-fs-desc);
+  line-height: var(--tps-lh-base);
+  color: var(--tps-text-muted);
+  cursor: pointer;
+}
+
+.tps-section-body > .tps-opt-note {
+  margin: var(--tps-space-2) -10px 0;
+  padding: 0 10px 0 calc(10px + 18px + var(--tps-space-3));
+  font-size: var(--tps-fs-desc);
+  line-height: var(--tps-lh-base);
+  color: var(--tps-text-muted);
+}
+
+.tps-opt > input:checked ~ .tps-opt-label {
+  color: var(--tps-accent);
+}
+
+/* Checkbox option + nested number row (e.g. tuned value under a toggle) */
+.tps-section-body:has(> .tps-opt-group) {
+  margin-top: 0;
+  gap: 0;
+}
+
+.tps-opt-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.tps-opt-group + .tps-opt-group {
+  margin-top: 0;
+}
+
+.tps-opt-group .tps-opt-group__value,
+.tps-opt-group > .tps-num {
+  margin-left: calc(18px + var(--tps-space-3));
+  margin-top: var(--tps-space-1);
+  margin-bottom: var(--tps-space-3);
+  padding-right: 10px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.tps-opt-group .tps-num-grid {
+  margin-left: calc(18px + var(--tps-space-3));
+  margin-top: var(--tps-space-1);
+  margin-bottom: var(--tps-space-3);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* \u2500\u2500 Numeric stepper \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-num {
+  display: flex;
+  align-items: center;
+  gap: var(--tps-space-1);
+}
+
+.tps-num-label {
+  flex: 0 0 auto;
+  min-width: 0;
+  font-size: var(--tps-fs-label);
+  color: var(--tps-text);
+  margin-right: var(--tps-space-2);
+}
+
+.tps-num-step,
+.tps-num-input,
+.tps-num-reset {
+  font-family: inherit;
+  font-size: var(--tps-fs-button);
+  height: var(--tps-control-h-sm);
+  border: 1px solid var(--tps-divider);
+  border-radius: var(--tps-radius-sm);
+  background: transparent;
+  color: var(--tps-text);
+  transition: border-color var(--tps-dur-fast) var(--tps-ease-out),
+              background-color var(--tps-dur-fast) var(--tps-ease-out),
+              color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-num-step {
+  width: var(--tps-num-step-w);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tps-num-step:hover {
+  border-color: var(--tps-border);
+  background: var(--tps-bg-hover);
+}
+
+.tps-num-step:active {
+  background: var(--tps-bg-active);
+}
+
+.tps-num-input {
+  width: var(--tps-input-w);
+  padding: 0 var(--tps-space-2);
+  background: var(--tps-bg-input);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.tps-num-input::-webkit-outer-spin-button,
+.tps-num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tps-num-input:focus {
+  outline: none;
+  border-color: var(--tps-accent);
+}
+
+.tps-num-unit {
+  font-size: var(--tps-fs-hint);
+  color: var(--tps-text-muted);
+  margin: 0 var(--tps-space-2);
+}
+
+.tps-num-reset {
+  font-size: 11px;
+  color: var(--tps-text-muted);
+  padding: 0 var(--tps-space-2);
+  cursor: pointer;
+}
+
+.tps-num-reset:hover {
+  color: var(--tps-text);
+  border-color: var(--tps-border);
+}
+
+.tps-num-reset[hidden] {
+  display: none !important;
+}
+
+/* Stacked layout: label / control row in a 200px / 1fr grid */
+
+.tps-num-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  column-gap: var(--tps-space-3);
+  row-gap: var(--tps-space-2);
+}
+
+.tps-num-grid > .tps-num-label {
+  margin: 0;
+  text-align: left;
+}
+
+.tps-num-grid > .tps-num {
+  justify-self: start;
+}
+
+/* \u2500\u2500 Slider row \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+/* Shared range styling for sliderRow and any other range input in a panel.
+   Exclude hue pickers that paint their own gradient track. */
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue) {
+  width: 100%;
+  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue)::-webkit-slider-runnable-track {
+  height: var(--tps-track-h);
+  border-radius: 3px;
+  background: var(--tps-slider-track);
+}
+
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue)::-moz-range-track {
+  height: var(--tps-track-h);
+  border-radius: 3px;
+  background: var(--tps-slider-track);
+}
+
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue)::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--tps-thumb-size);
+  height: var(--tps-thumb-size);
+  border-radius: var(--tps-radius-circle);
+  background: var(--tps-accent);
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+  margin-top: -5px;
+}
+
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue)::-moz-range-thumb {
+  width: var(--tps-thumb-size);
+  height: var(--tps-thumb-size);
+  border-radius: var(--tps-radius-circle);
+  background: var(--tps-accent);
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+}
+
+.tps-panel input[type="range"]:not(.plg-collection-colors__hue):active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+.tps-slider {
+  display: grid;
+  grid-template-columns: 90px 1fr 56px auto;
+  align-items: center;
+  gap: var(--tps-space-3);
+}
+
+.tps-slider-label {
+  font-size: var(--tps-fs-section);
+  font-weight: var(--tps-fw-semibold);
+  letter-spacing: var(--tps-ls-section);
+  text-transform: uppercase;
+  color: var(--tps-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tps-slider-input {
+  width: 100%;
+  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.tps-slider-input::-webkit-slider-runnable-track {
+  height: var(--tps-track-h);
+  border-radius: 3px;
+  background: var(--tps-slider-track);
+}
+
+.tps-slider-input::-moz-range-track {
+  height: var(--tps-track-h);
+  border-radius: 3px;
+  background: var(--tps-slider-track);
+}
+
+.tps-slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--tps-thumb-size);
+  height: var(--tps-thumb-size);
+  border-radius: var(--tps-radius-circle);
+  background: var(--tps-accent);
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+  margin-top: -5px;
+}
+
+.tps-slider-input::-moz-range-thumb {
+  width: var(--tps-thumb-size);
+  height: var(--tps-thumb-size);
+  border-radius: var(--tps-radius-circle);
+  background: var(--tps-accent);
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+}
+
+.tps-slider-input:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+/* Hue picker keeps its gradient track; only style the thumb. */
+.tps-panel input[type="range"].plg-collection-colors__hue {
+  width: 100%;
+  height: 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.tps-panel input[type="range"].plg-collection-colors__hue::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--tps-radius-circle);
+  background: var(--panel-bg-color, var(--tps-panel-bg, currentColor));
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+}
+
+.tps-panel input[type="range"].plg-collection-colors__hue::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--tps-radius-circle);
+  background: var(--panel-bg-color, var(--tps-panel-bg, currentColor));
+  border: 2px solid var(--tps-slider-thumb-border);
+  box-shadow: var(--tps-shadow-thumb);
+  cursor: grab;
+}
+
+.tps-slider-value {
+  font-family: var(--tps-font-mono);
+  font-size: var(--tps-fs-value);
+  color: var(--tps-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* \u2500\u2500 Swatch + grid \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--tps-swatch-size));
+  gap: var(--tps-space-2) 6px;
+}
+
+.tps-swatch {
+  width: var(--tps-swatch-size);
+  height: var(--tps-swatch-size);
+  border-radius: var(--tps-radius-circle);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--tps-swatch-inset);
+  transition: transform var(--tps-dur-fast) var(--tps-ease-out),
+              box-shadow var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-swatch:hover {
+  transform: scale(1.1);
+}
+
+.tps-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--tps-accent);
+}
+
+/* \u2500\u2500 List rows \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tps-list-header {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: var(--tps-space-3);
+  padding: var(--tps-space-2) var(--tps-space-3);
+  border-bottom: 1px solid var(--tps-divider);
+  font-size: var(--tps-fs-list-header);
+  font-weight: var(--tps-fw-bold);
+  letter-spacing: var(--tps-ls-list);
+  text-transform: uppercase;
+  color: var(--tps-text-faint);
+}
+
+.tps-list-row {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: var(--tps-space-3);
+  padding: var(--tps-space-2) var(--tps-space-3);
+  border-bottom: 1px solid var(--tps-divider);
+  transition: background-color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-list-row:last-child {
+  border-bottom: 0;
+}
+
+.tps-list-row:hover {
+  background: var(--tps-bg-hover);
+}
+
+.tps-list-name {
+  font-size: var(--tps-fs-label);
+  color: var(--tps-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* \u2500\u2500 Tabs / segmented control \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tps-space-1);
+  padding: 0;
+}
+
+.tps-tab {
+  height: var(--tps-control-h-sm);
+  padding: 0 var(--tps-space-2);
+  font-family: inherit;
+  font-size: var(--tps-fs-button);
+  font-weight: var(--tps-fw-medium);
+  color: var(--tps-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--tps-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--tps-dur-fast) var(--tps-ease-out),
+              border-color var(--tps-dur-fast) var(--tps-ease-out),
+              color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-tab:hover {
+  background: var(--tps-bg-hover);
+  color: var(--tps-text);
+}
+
+.tps-tab[aria-pressed="true"],
+.tps-tab[aria-selected="true"] {
+  background: var(--tps-accent-soft);
+  color: var(--tps-accent);
+  border-color: color-mix(in srgb, var(--tps-accent) 50%, transparent);
+}
+
+/* \u2500\u2500 Buttons \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tps-space-1);
+  height: var(--tps-control-h-sm);
+  padding: 0 var(--tps-space-3);
+  font-family: inherit;
+  font-size: var(--tps-fs-button);
+  font-weight: var(--tps-fw-medium);
+  border-radius: var(--tps-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--tps-dur-fast) var(--tps-ease-out),
+              border-color var(--tps-dur-fast) var(--tps-ease-out),
+              color var(--tps-dur-fast) var(--tps-ease-out);
+}
+
+.tps-button--md { height: var(--tps-control-h-md); padding: 0 var(--tps-space-4); }
+
+.tps-button--primary {
+  background: var(--tps-accent);
+  color: var(--tps-on-accent);
+}
+
+.tps-button--primary:hover {
+  filter: brightness(1.08);
+}
+
+.tps-button--ghost {
+  background: transparent;
+  border-color: var(--tps-divider);
+  color: var(--tps-text);
+}
+
+.tps-button--ghost:hover {
+  background: var(--tps-bg-hover);
+  border-color: var(--tps-border);
+}
+
+.tps-button--danger {
+  background: transparent;
+  border-color: var(--tps-divider);
+  color: var(--tps-text-muted);
+}
+
+.tps-button--danger:hover {
+  background: var(--tps-danger-soft);
+  border-color: color-mix(in srgb, var(--tps-danger) 40%, transparent);
+  color: var(--tps-danger);
+}
+
+/* \u2500\u2500 Focus rings (custom controls only \u2014 native inputs use accent-color) \u2500 */
+
+.tps-tab:focus-visible,
+.tps-button:focus-visible,
+.tps-num-step:focus-visible,
+.tps-num-reset:focus-visible,
+.tps-swatch:focus-visible {
+  outline: 2px solid var(--tps-accent);
+  outline-offset: 2px;
+}
+
+/* \u2500\u2500 Inset card variant (rare \u2014 for palette-picker body, etc.) \u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+
+.tps-card {
+  padding: var(--tps-space-3);
+  border-radius: var(--tps-radius-lg);
+  background: var(--tps-bg-input);
+  border: 1px solid var(--tps-divider);
+}
+`;
+
+  // ../../shared/settings-ui/color-field.css
+  var color_field_default = `/*
+ * colorField \u2014 shared color picker (Theme | Tailwind | Custom).
+ * Scoped under .tps-panel .tps-color-field; styled through --tps-* tokens.
+ * Every selectable swatch is the same .tps-cf-dot across all three tabs.
+ */
+
+.tps-panel .tps-color-field { display: block; }
+
+/* \u2500\u2500 Tabs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-tabs {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+  background: var(--tps-bg-input, rgba(127,127,127,0.06));
+  border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  border-radius: var(--tps-radius-md, 8px);
+  padding: 4px; margin-bottom: var(--tps-space-3, 12px);
+}
+.tps-panel .tps-cf-tab {
+  cursor: pointer; border: 0; background: transparent;
+  border-radius: var(--tps-radius-sm, 6px); padding: 8px 10px; font: inherit;
+  font-size: var(--tps-fs-body, 13px); font-weight: var(--tps-fw-semibold, 600);
+  color: var(--tps-text-muted, rgba(127,127,127,0.75));
+  transition: background var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease),
+              color var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease);
+}
+.tps-panel .tps-cf-tab:hover { color: var(--tps-text, inherit); }
+.tps-panel .tps-cf-tab.is-active {
+  background: var(--tps-panel-bg, var(--bg-default, #fff));
+  color: var(--tps-text, inherit); box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+/* \u2500\u2500 Panes \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-pane { display: none; }
+.tps-panel .tps-cf-pane.is-active { display: block; }
+
+/* \u2500\u2500 Featured theme picks \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-featured {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  margin-bottom: var(--tps-space-3, 12px);
+}
+.tps-panel .tps-cf-tile {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer;
+  background: var(--tps-bg-hover, rgba(127,127,127,0.04));
+  border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  border-radius: var(--tps-radius-md, 8px); padding: 10px 12px; color: var(--tps-text, inherit);
+  transition: border-color var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease),
+              background var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease);
+}
+.tps-panel .tps-cf-tile:hover { border-color: var(--tps-border-strong, rgba(127,127,127,0.28)); }
+.tps-panel .tps-cf-tile.is-sel {
+  border-color: var(--tps-accent, currentColor);
+  background: var(--tps-accent-soft, rgba(127,127,127,0.08));
+}
+.tps-panel .tps-cf-tile-dot {
+  width: 22px; height: 22px; flex: 0 0 auto; border-radius: var(--tps-radius-sm, 6px);
+  box-shadow: inset 0 0 0 1px var(--tps-swatch-inset, rgba(127,127,127,0.18));
+}
+.tps-panel .tps-cf-tile-label {
+  font-size: var(--tps-fs-body, 13px); font-weight: var(--tps-fw-semibold, 600);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* \u2500\u2500 Groups + the universal swatch dot \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-group { margin-bottom: var(--tps-space-3, 12px); }
+.tps-panel .tps-cf-group-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: var(--tps-space-2, 8px); }
+.tps-panel .tps-cf-group-label {
+  font-size: var(--tps-fs-section, 11px); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--tps-text-faint, var(--tps-text-muted, rgba(127,127,127,0.6))); font-weight: var(--tps-fw-semibold, 600);
+}
+.tps-panel .tps-cf-group-hint { font-size: var(--tps-fs-section, 11px); color: var(--tps-text-faint, rgba(127,127,127,0.5)); }
+
+/* \u2500\u2500 Swatches: square dots that fill the row width (22 across in the Tailwind
+ *    hue row); every swatch elsewhere matches that width. \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-dots {
+  display: grid; grid-template-columns: repeat(22, minmax(0, 1fr)); gap: 5px;
+  /* explicit resets so a stale accumulated .tps-cf-dots rule (old edge-to-edge
+   * build injected an inset-ring outline) can't linger after a plugin reload. */
+  border: 0; border-radius: 0; overflow: visible; box-shadow: none; background: none; padding: 0;
+}
+.tps-panel .tps-cf-dot {
+  aspect-ratio: 1 / 1; min-width: 0; width: 100%; height: auto; border: 0; padding: 0; margin: 0;
+  cursor: pointer; position: relative;
+  border-radius: var(--tps-radius-sm, 6px);
+  box-shadow: inset 0 0 0 1px var(--tps-swatch-inset, rgba(127,127,127,0.18));
+  transition: transform var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease),
+              box-shadow var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease);
+}
+.tps-panel .tps-cf-dot:hover { transform: scale(1.12); z-index: 3; }
+.tps-panel .tps-cf-dot:focus-visible,
+.tps-panel .tps-cf-dot.is-sel,
+.tps-panel .tps-cf-dot.is-active {
+  outline: none; z-index: 4;
+  box-shadow: inset 0 0 0 1px var(--tps-swatch-inset, rgba(127,127,127,0.18)),
+              0 0 0 2px var(--tps-panel-bg, #fff), 0 0 0 4px var(--tps-accent, currentColor);
+}
+
+/* \u2500\u2500 Lightness "tints": full-width ramp, shade number inside (do not touch) \u2500 */
+.tps-panel .tps-cf-ramp {
+  display: grid; grid-template-columns: repeat(11, minmax(0, 1fr));
+  border-radius: var(--tps-radius-md, 8px); overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--tps-border, rgba(127,127,127,0.14));
+}
+.tps-panel .tps-cf-ramp-cell {
+  border: 0; padding: 0; cursor: pointer; height: 30px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: var(--tps-fw-semibold, 600); font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+  transition: box-shadow var(--tps-dur-fast, 80ms) var(--tps-ease-out, ease);
+}
+.tps-panel .tps-cf-ramp-cell:hover { z-index: 3; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tps-panel-bg, #fff) 60%, transparent); }
+.tps-panel .tps-cf-ramp-cell:focus-visible,
+.tps-panel .tps-cf-ramp-cell.is-sel {
+  outline: none; z-index: 4;
+  box-shadow: inset 0 0 0 2px var(--tps-panel-bg, #fff), inset 0 0 0 4px var(--tps-accent, currentColor);
+}
+/* Faint secondary ring on the inverted ("invert lightness") mirror shade \u2014
+   present alongside the prominent ring on the actually-selected shade. */
+.tps-panel .tps-cf-ramp-cell.is-sel-mirror {
+  z-index: 3;
+  box-shadow: inset 0 0 0 2px var(--tps-panel-bg, #fff),
+              inset 0 0 0 3px color-mix(in srgb, var(--tps-accent, currentColor) 42%, transparent);
+}
+
+/* \u2500\u2500 Invert-lightness toggle \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-invert {
+  display: flex; align-items: center; gap: 8px; margin-top: var(--tps-space-3, 12px);
+  cursor: pointer; font-size: var(--tps-fs-hint, 12px); color: var(--tps-text, inherit); font-weight: var(--tps-fw-medium, 500);
+}
+.tps-panel .tps-cf-invert-cb { margin: 0; cursor: pointer; accent-color: var(--tps-accent, currentColor); }
+.tps-panel .tps-cf-invert-hint { color: var(--tps-text-faint, rgba(127,127,127,0.5)); font-weight: var(--tps-fw-regular, 400); }
+/* Dimmed + non-interactive until a real, non-500 shade is picked (500 mirrors
+   to itself, so inverting it is a no-op). */
+.tps-panel .tps-cf-invert.is-disabled { opacity: 0.42; cursor: default; }
+.tps-panel .tps-cf-invert.is-disabled .tps-cf-invert-cb { cursor: default; }
+
+/* \u2500\u2500 Custom palette \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-custom-row { min-height: 30px; margin-bottom: var(--tps-space-3, 12px); }
+.tps-panel .tps-cf-custom-empty {
+  grid-column: 1 / -1; display: flex; align-items: center; padding: 0 10px; min-height: 30px;
+  font-size: var(--tps-fs-hint, 12px); font-weight: var(--tps-fw-regular, 400); letter-spacing: 0;
+  color: var(--tps-text-faint, rgba(127,127,127,0.55));
+}
+.tps-panel .tps-cf-custom-dot { cursor: grab; }
+.tps-panel .tps-cf-custom-dot.is-dragging { opacity: 0.4; cursor: grabbing; }
+
+.tps-panel .tps-cf-addrow { display: flex; align-items: center; gap: 8px; }
+.tps-panel .tps-cf-remove {
+  cursor: pointer; border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  background: var(--tps-bg-input, rgba(127,127,127,0.06)); color: var(--tps-text-muted, rgba(127,127,127,0.75));
+  border-radius: var(--tps-radius-md, 8px); height: 32px; padding: 0 14px; font: inherit;
+  font-size: var(--tps-fs-hint, 12px); font-weight: var(--tps-fw-medium, 500);
+}
+.tps-panel .tps-cf-remove[hidden] { display: none; }
+.tps-panel .tps-cf-remove:hover { border-color: var(--tps-border-strong, rgba(127,127,127,0.28)); color: var(--tps-text, inherit); }
+.tps-panel .tps-cf-add {
+  cursor: pointer; border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  background: var(--tps-bg-input, rgba(127,127,127,0.06)); color: var(--tps-text, inherit);
+  border-radius: var(--tps-radius-md, 8px); height: 32px; padding: 0 14px; font: inherit;
+  font-size: var(--tps-fs-hint, 12px); font-weight: var(--tps-fw-semibold, 600);
+}
+.tps-panel .tps-cf-add:hover { border-color: var(--tps-border-strong, rgba(127,127,127,0.28)); }
+.tps-panel .tps-cf-custom-count {
+  margin-left: auto; font-size: var(--tps-fs-section, 11px);
+  color: var(--tps-text-faint, rgba(127,127,127,0.5)); font-variant-numeric: tabular-nums;
+}
+
+/* \u2500\u2500 Hex input \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-hexbox {
+  display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; height: 32px;
+  background: var(--tps-bg-input, rgba(127,127,127,0.06));
+  border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  border-radius: var(--tps-radius-md, 8px); padding: 0 8px 0 10px;
+}
+.tps-panel .tps-cf-hex-dot {
+  width: 15px; height: 15px; border-radius: var(--tps-radius-sm, 5px);
+  box-shadow: inset 0 0 0 1px var(--tps-swatch-inset, rgba(127,127,127,0.22));
+}
+.tps-panel .tps-cf-hex-input {
+  border: 0; background: transparent; outline: none;
+  font-family: var(--tps-font-mono, ui-monospace, monospace);
+  font-size: var(--tps-fs-hint, 12px); color: var(--tps-text, inherit); width: 84px;
+  font-variant-numeric: tabular-nums;
+}
+.tps-panel .tps-cf-hex-input::placeholder { color: var(--tps-text-faint, rgba(127,127,127,0.5)); }
+
+/* \u2500\u2500 Universal: No color \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+.tps-panel .tps-cf-divider {
+  height: 1px; margin: var(--tps-space-3, 12px) 0; background: var(--tps-divider, rgba(127,127,127,0.12));
+}
+.tps-panel .tps-cf-universal { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tps-panel .tps-cf-none {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer; box-sizing: border-box; height: 32px;
+  background: var(--tps-bg-input, rgba(127,127,127,0.06));
+  border: 1px solid var(--tps-border, rgba(127,127,127,0.14));
+  border-radius: var(--tps-radius-md, 8px); padding: 0 12px; font: inherit;
+  font-size: var(--tps-fs-hint, 12px); font-weight: var(--tps-fw-medium, 500);
+  color: var(--tps-text-muted, rgba(127,127,127,0.7));
+}
+.tps-panel .tps-cf-none:hover { border-color: var(--tps-border-strong, rgba(127,127,127,0.28)); color: var(--tps-text, inherit); }
+.tps-panel .tps-cf-none.is-sel { border-color: var(--tps-accent, currentColor); color: var(--tps-text, inherit); }
+.tps-panel .tps-cf-none-sw {
+  width: 15px; height: 15px; border-radius: 50%; position: relative; overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--tps-border-strong, rgba(127,127,127,0.3));
+}
+.tps-panel .tps-cf-none-sw::after {
+  content: ""; position: absolute; left: 50%; top: -3px; width: 1.5px; height: 21px;
+  background: var(--tps-danger, #e2555f); transform: rotate(45deg);
+}
+
+/* \u2500\u2500 Instant tooltip (drawn by the component, not native title delay) \u2500\u2500\u2500 */
+.tps-panel .tps-cf-tip {
+  position: fixed; z-index: 2147483000; transform: translate(-50%, calc(-100% - 8px));
+  padding: 3px 8px; border-radius: var(--tps-radius-sm, 5px);
+  background: var(--tps-text, #1a1a1a); color: var(--tps-panel-bg, #fff);
+  font-size: var(--tps-fs-section, 11px); font-weight: var(--tps-fw-medium, 500);
+  line-height: 1.3; white-space: nowrap; pointer-events: none; opacity: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.tps-panel .tps-cf-tip.is-visible { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tps-panel .tps-cf-dot,
+  .tps-panel .tps-cf-tab,
+  .tps-panel .tps-cf-tile,
+  .tps-panel .tps-cf-remove { transition: none; }
+}
+`;
+
+  // ../../shared/settings-ui/helpers.js
+  var PANEL_CSS = tokens_default + "\n" + components_default + "\n" + color_field_default;
+  function h(tag, props, ...children) {
+    const el = document.createElement(tag);
+    const dom = (
+      /** @type {any} */
+      el
+    );
+    if (props) {
+      for (const k in props) {
+        const v = props[k];
+        if (v == null || v === false) continue;
+        if (k === "class" || k === "className") {
+          el.className = v;
+        } else if (k === "style" && typeof v === "object") {
+          Object.assign(el.style, v);
+        } else if (k === "dataset" && typeof v === "object") {
+          for (const dk in v) el.dataset[dk] = v[dk];
+        } else if (k.startsWith("on") && typeof v === "function") {
+          el.addEventListener(k.slice(2).toLowerCase(), v);
+        } else if (k in dom && typeof dom[k] !== "function") {
+          try {
+            dom[k] = v;
+          } catch {
+            el.setAttribute(k, v);
+          }
+        } else {
+          el.setAttribute(k, v === true ? "" : String(v));
+        }
+      }
+    }
+    appendChildren(el, children);
+    return el;
+  }
+  __name(h, "h");
+  function appendChildren(parent, children) {
+    for (const c of children) {
+      if (c == null || c === false) continue;
+      if (Array.isArray(c)) {
+        appendChildren(parent, c);
+        continue;
+      }
+      parent.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
+    }
+  }
+  __name(appendChildren, "appendChildren");
+  function panel({ pluginClass } = {}, children = []) {
+    const cls = ["tps-panel", pluginClass].filter(Boolean).join(" ");
+    return h("div", { class: cls }, ...children);
+  }
+  __name(panel, "panel");
+  function pluginHeader({
+    title: heading,
+    lede: ledeText,
+    helper,
+    helperOpen,
+    helperDefaultOpen = false,
+    onHelperToggle,
+    icon = "",
+    version = "1.0",
+    author = "@akaready",
+    homepage = "https://akaready.com",
+    repository = "https://github.com/akaready",
+    coffee = "https://buymeacoffee.com/akaready"
+  }) {
+    const iconClass = icon ? icon.startsWith("ti-") ? icon : `ti-${icon}` : "";
+    const helperLines = normalizeHelperLines(helper);
+    const children = [
+      iconClass ? h(
+        "div",
+        { class: "tps-plugin-header-logo", "aria-hidden": "true" },
+        h("i", { class: `ti ${iconClass} tps-plugin-header-logo-icon`, "aria-hidden": "true" })
+      ) : null,
+      h("h1", { class: "tps-plugin-header-title" }, heading),
+      ledeText ? h("p", { class: "tps-plugin-header-lede" }, ledeText) : null,
+      helperLines.length ? renderPluginHeaderHelper({
+        lines: helperLines,
+        defaultOpen: helperDefaultOpen,
+        open: helperOpen,
+        onToggle: onHelperToggle
+      }) : null,
+      h(
+        "p",
+        { class: "tps-plugin-header-attr" },
+        h(
+          "span",
+          { class: "tps-plugin-header-link-group" },
+          h("i", { class: "ti ti-link tps-plugin-header-icon", "aria-hidden": "true" }),
+          h("a", {
+            class: "tps-plugin-header-link tps-plugin-header-link--blue",
+            href: homepage,
+            target: "_blank",
+            rel: "noopener noreferrer"
+          }, author)
+        ),
+        h(
+          "span",
+          { class: "tps-plugin-header-link-group" },
+          h("i", { class: "ti ti-coffee tps-plugin-header-icon", "aria-hidden": "true" }),
+          h("a", {
+            class: "tps-plugin-header-link tps-plugin-header-link--pink",
+            href: coffee,
+            target: "_blank",
+            rel: "noopener noreferrer"
+          }, "buy me a coffee")
+        ),
+        version ? h(
+          "span",
+          { class: "tps-plugin-header-link-group" },
+          h("span", { class: "tps-plugin-header-icon tps-plugin-header-iconify tps-plugin-header-iconify-github", "aria-hidden": "true" }),
+          h("a", { class: "tps-plugin-header-link tps-plugin-header-link--muted tps-plugin-header-version", href: repository, target: "_blank", rel: "noopener noreferrer" }, `v${version}`)
+        ) : null
+      )
+    ];
+    return h("div", { class: "tps-plugin-header" }, ...children);
+  }
+  __name(pluginHeader, "pluginHeader");
+  function normalizeHelperLines(helper) {
+    if (!helper) return [];
+    if (typeof helper === "string") {
+      const text = helper.trim();
+      return text ? [text] : [];
+    }
+    if (Array.isArray(helper)) {
+      return helper.map((line) => String(line).trim()).filter(Boolean);
+    }
+    return [];
+  }
+  __name(normalizeHelperLines, "normalizeHelperLines");
+  function renderPluginHeaderHelper({ lines, defaultOpen = false, open, onToggle }) {
+    const initialOpen = open == null ? !!defaultOpen : !!open;
+    const wrap = h("div", {
+      class: "tps-plugin-header-helper-wrap",
+      dataset: { open: String(initialOpen) }
+    });
+    const icon = h("i", { class: "ti ti-info-circle tps-plugin-header-helper-icon", "aria-hidden": "true" });
+    const toggle = h("button", {
+      type: "button",
+      class: "tps-plugin-header-helper-toggle",
+      "aria-expanded": String(initialOpen)
+    }, icon, h("span", { class: "tps-plugin-header-helper-toggle-label" }, "Instructions"));
+    const body = h(
+      "div",
+      { class: "tps-plugin-header-helper-body" },
+      h("p", { class: "tps-plugin-header-helper-line" }, lines.join(" "))
+    );
+    const setOpen = /* @__PURE__ */ __name((nextOpen) => {
+      wrap.dataset.open = String(nextOpen);
+      toggle.setAttribute("aria-expanded", String(nextOpen));
+      if (onToggle) onToggle(nextOpen);
+    }, "setOpen");
+    toggle.addEventListener("click", () => {
+      setOpen(wrap.dataset.open !== "true");
+    });
+    body.addEventListener("click", () => {
+      if (wrap.dataset.open === "true") setOpen(false);
+    });
+    wrap.appendChild(toggle);
+    wrap.appendChild(body);
+    return wrap;
+  }
+  __name(renderPluginHeaderHelper, "renderPluginHeaderHelper");
+  function pluginHeaderFromConfig(conf, { version, helper, helperOpen, helperDefaultOpen, onHelperToggle } = {}) {
+    const resolvedHelper = helper ?? conf.instructions;
+    return pluginHeader({
+      title: conf.name || "",
+      lede: conf.description,
+      helper: resolvedHelper,
+      helperOpen,
+      helperDefaultOpen,
+      onHelperToggle,
+      icon: conf.icon,
+      version: version ?? conf.version,
+      author: conf.author,
+      homepage: conf.homepage,
+      repository: conf.repository,
+      coffee: conf.coffee
+    });
+  }
+  __name(pluginHeaderFromConfig, "pluginHeaderFromConfig");
+  function section({ label, hint, collapsible, defaultOpen = true, open, onToggle, summary, body = [] }) {
+    const bodyChildren = Array.isArray(body) ? body : [body];
+    const bodyEl = h("div", { class: "tps-section-body" }, ...bodyChildren);
+    if (!collapsible) {
+      return h(
+        "section",
+        { class: "tps-section" },
+        h("div", { class: "tps-section-label" }, label),
+        hint ? h("p", { class: "tps-section-hint" }, hint) : null,
+        bodyEl
+      );
+    }
+    const initialOpen = open == null ? !!defaultOpen : !!open;
+    const sectionEl = h("section", {
+      class: "tps-section tps-section--collapsible",
+      dataset: { open: String(initialOpen) }
+    });
+    const chev = h("span", { class: "tps-section-chev", "aria-hidden": "true" }, "\u25B8");
+    const labelEl = h("span", { class: "tps-section-label" }, label);
+    const summaryEl = h("span", { class: "tps-section-summary" });
+    const paintSummary = /* @__PURE__ */ __name((isOpen) => {
+      summaryEl.replaceChildren();
+      if (isOpen || summary == null) return;
+      const content = typeof summary === "function" ? summary() : summary;
+      if (content == null || content === "") return;
+      if (typeof content === "string") summaryEl.textContent = content;
+      else summaryEl.appendChild(content);
+    }, "paintSummary");
+    const setOpen = /* @__PURE__ */ __name((nextOpen) => {
+      sectionEl.dataset.open = String(nextOpen);
+      header.setAttribute("aria-expanded", String(nextOpen));
+      paintSummary(nextOpen);
+      if (onToggle) onToggle(nextOpen);
+    }, "setOpen");
+    const header = h("button", {
+      type: "button",
+      class: "tps-section-header",
+      "aria-expanded": String(initialOpen),
+      onClick: /* @__PURE__ */ __name(() => setOpen(sectionEl.dataset.open !== "true"), "onClick")
+    }, chev, labelEl, summaryEl);
+    paintSummary(initialOpen);
+    sectionEl.appendChild(header);
+    if (hint) sectionEl.appendChild(h("p", { class: "tps-section-hint" }, hint));
+    sectionEl.appendChild(bodyEl);
+    return sectionEl;
+  }
+  __name(section, "section");
+  function optionRow({ type = "checkbox", name, value, label, desc, checked, onChange }) {
+    const input = h("input", {
+      type,
+      name,
+      value,
+      checked: !!checked,
+      onChange: onChange ? (e) => onChange(e) : null
+    });
+    const labelEl = h("span", { class: "tps-opt-label" }, label);
+    const descEl = desc ? h("span", { class: "tps-opt-desc" }, desc) : null;
+    return h("label", { class: "tps-opt" }, input, labelEl, descEl);
+  }
+  __name(optionRow, "optionRow");
+  function sliderRow({ label, value, min = 0, max = 100, step = 1, format, defaultValue, onChange, onReset }) {
+    const fmt = format || ((v) => String(v));
+    const input = h("input", {
+      type: "range",
+      class: "tps-slider-input",
+      value,
+      min,
+      max,
+      step,
+      onInput: /* @__PURE__ */ __name((e) => {
+        const target = (
+          /** @type {HTMLInputElement} */
+          e.target
+        );
+        const v = Number(target.value);
+        readout.textContent = fmt(v);
+        onChange && onChange(v, e);
+      }, "onInput")
+    });
+    const readout = h("span", { class: "tps-slider-value" }, fmt(value));
+    const reset = defaultValue != null ? h("button", {
+      type: "button",
+      class: "tps-num-reset",
+      onClick: /* @__PURE__ */ __name(() => {
+        input.value = String(defaultValue);
+        readout.textContent = fmt(defaultValue);
+        onChange && onChange(defaultValue);
+        onReset && onReset();
+      }, "onClick")
+    }, "Reset") : null;
+    return h(
+      "div",
+      { class: "tps-slider" },
+      h("span", { class: "tps-slider-label" }, label),
+      input,
+      readout,
+      reset
+    );
+  }
+  __name(sliderRow, "sliderRow");
+  function listRow({ icon, name, controls }) {
+    const ctrlChildren = controls == null ? [] : Array.isArray(controls) ? controls : [controls];
+    return h(
+      "div",
+      { class: "tps-list-row" },
+      h("div", null, icon || null),
+      h("div", { class: "tps-list-name" }, name),
+      h("div", null, ...ctrlChildren)
+    );
+  }
+  __name(listRow, "listRow");
+  function tabs({ options, value, onChange, multiSelect = false }) {
+    const isActive = /* @__PURE__ */ __name((v) => multiSelect ? Array.isArray(value) && value.includes(v) : value === v, "isActive");
+    return h(
+      "div",
+      { class: "tps-tabs", role: "tablist" },
+      ...options.map((opt) => h("button", {
+        type: "button",
+        class: "tps-tab",
+        role: "tab",
+        "aria-pressed": String(isActive(opt.value)),
+        onClick: /* @__PURE__ */ __name(() => {
+          if (!onChange) return;
+          if (multiSelect) {
+            const cur = Array.isArray(value) ? value.slice() : [];
+            const i = cur.indexOf(opt.value);
+            if (i >= 0) cur.splice(i, 1);
+            else cur.push(opt.value);
+            onChange(cur);
+          } else {
+            onChange(opt.value);
+          }
+        }, "onClick")
+      }, opt.label))
+    );
+  }
+  __name(tabs, "tabs");
+
+  // ../../shared/plugin-version.js
+  function readPluginVersion(conf, fallback = "0.0.1") {
+    if (!conf || typeof conf !== "object") return fallback;
+    if (typeof conf.version === "string" && conf.version) return conf.version;
+    const custom = conf.custom;
+    if (custom && typeof custom === "object" && typeof custom.pluginVersion === "string" && custom.pluginVersion) {
+      return custom.pluginVersion;
+    }
+    return fallback;
+  }
+  __name(readPluginVersion, "readPluginVersion");
+  function configWithPluginVersion(conf, customPatch, pluginVersion) {
+    const base = conf && typeof conf === "object" ? conf : {};
+    const custom = base.custom && typeof base.custom === "object" ? base.custom : {};
+    return {
+      ...base,
+      version: pluginVersion,
+      custom: {
+        ...custom,
+        ...customPatch,
+        pluginVersion
+      }
+    };
+  }
+  __name(configWithPluginVersion, "configWithPluginVersion");
+  async function syncPluginVersionOnLoad(plugin, pluginVersion, customPatch = {}) {
+    if (!plugin || typeof plugin.saveConfiguration !== "function") return;
+    let conf = {};
+    try {
+      conf = plugin.getConfiguration?.() || {};
+    } catch {
+      return;
+    }
+    if (typeof conf.name !== "string" || !conf.name.trim()) return;
+    const custom = conf.custom && typeof conf.custom === "object" ? { .../** @type {Record<string, unknown>} */
+    conf.custom, ...customPatch } : { ...customPatch };
+    if (readPluginVersion(conf, "") === pluginVersion) return;
+    try {
+      await plugin.saveConfiguration(configWithPluginVersion(conf, custom, pluginVersion));
+    } catch {
+    }
+  }
+  __name(syncPluginVersionOnLoad, "syncPluginVersionOnLoad");
+
+  // plugin.js
+  var PLUGIN_VERSION = "1.0.0";
+  var ROOT_CLASS = "plg-status-bar-manager";
+  var PANEL_CLASS = `${ROOT_CLASS}-panel`;
+  var TRIGGER_CLASS = "plg-sbm-trigger";
+  var PANEL_TYPE = "sbm-settings";
+  var TRIGGER_KEY = "__trigger__";
+  var BAR_SELECTOR = ".statusbar--status-bar";
+  var LEFT_SELECTOR = ".statusbar--left";
+  var RIGHT_SELECTOR = ".statusbar--right";
+  var BODY_BARTENDER_OPEN = "plg-sbm-bartender-open";
+  var BODY_BARTENDER_CLOSING = "plg-sbm-bartender-closing";
+  var BODY_ICON_ONLY_PLUGINS = "plg-sbm-icon-only-plugins";
+  var BODY_ICON_ONLY_SHORTCUTS = "plg-sbm-icon-only-shortcuts";
+  var BODY_CUSTOM_SPACING = "plg-sbm-custom-spacing";
+  var BODY_UNIFORM_HOVER = "plg-sbm-uniform-hover";
+  var BODY_SPLIT_HOVER_ZONES = "plg-sbm-split-hover-zones";
+  var HOVER_TAG_CLASS = "plg-sbm-hover-tagged";
+  var HOVER_OVERLAY_CLASS = "plg-sbm-hover-overlay";
+  var HOVER_ANIM_MS = 220;
+  var REVEAL_STAGGER_MS = 12;
+  var MODES = Object.freeze({
+    SHOW: "show",
+    HIDE: "hide",
+    HOVER: "hover",
+    BARTENDER: "bartender"
+  });
+  var BUILTIN = Object.freeze({
+    shortcuts: { key: "shortcuts", label: "Keyboard shortcuts", icon: "ti-keyboard", selector: LEFT_SELECTOR, reorderable: false, tooltip: "Keyboard shortcuts" },
+    markdownMirror: { key: "markdownMirror", label: "Markdown mirror", icon: "ti-folder-bolt", selector: `${RIGHT_SELECTOR} .statusbar--markdown-mirror`, reorderable: true, tooltip: "Markdown mirror" },
+    mcpBridge: { key: "mcpBridge", label: "MCP bridge", icon: "ti-plug", selector: `${RIGHT_SELECTOR} .statusbar--mcp-bridge`, reorderable: true, tooltip: "MCP bridge" },
+    hotReload: { key: "hotReload", label: "Hot reload", icon: "ti-progress-bolt", selector: `${RIGHT_SELECTOR} .statusbar--hotreload`, reorderable: true, tooltip: "Plugin hot reload" },
+    thymer: { key: "thymer", label: "Thymer logo", icon: "ti-sparkles", selector: `${RIGHT_SELECTOR} .statusbar-item[event="onLogo"]`, reorderable: true, tooltip: "Thymer" },
+    user: { key: "user", label: "User & invite", icon: "ti-users", selector: `${RIGHT_SELECTOR} .statusbar--users, ${RIGHT_SELECTOR} .statusbar-item:has(.id--users-button)`, reorderable: true, tooltip: "User & invite" },
+    statusMsg: { key: "statusMsg", label: "Status message", icon: "ti-message-circle", selector: `${RIGHT_SELECTOR} .id--statusbar-msg`, reorderable: true, tooltip: "Status message" },
+    sync: { key: "sync", label: "Sync indicator", icon: "ti-refresh", selector: `${RIGHT_SELECTOR} .id--sync`, reorderable: true, tooltip: "Sync indicator" }
+  });
+  var DEFAULT_STATE = {
+    spacing: 0,
+    iconOnlyPlugins: true,
+    iconOnlyShortcuts: false,
+    uniformHover: true,
+    hoverRadius: 0,
+    splitHoverZones: true,
+    overrideTooltips: false,
+    triggerIcon: "adjustments",
+    tooltipOverrides: {},
+    // Built-in defaults. Any status-bar item NOT listed here (i.e. every other
+    // plugin's contributions, keyed `item:*`) defaults to `hide` — see
+    // `_defaultModeFor`. Keeps the bar to the built-ins out of the box.
+    modes: {
+      shortcuts: (
+        /** @type {ItemMode} */
+        MODES.HOVER
+      ),
+      markdownMirror: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      ),
+      mcpBridge: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      ),
+      hotReload: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      ),
+      thymer: (
+        /** @type {ItemMode} */
+        MODES.HIDE
+      ),
+      user: (
+        /** @type {ItemMode} */
+        MODES.HIDE
+      ),
+      statusMsg: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      ),
+      sync: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      ),
+      [TRIGGER_KEY]: (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      )
+    },
+    order: {}
+  };
+  var TRIGGER_ICON_OPTIONS = [
+    "adjustments",
+    "settings",
+    "tools",
+    "eye",
+    "sparkles",
+    "gauge",
+    "target",
+    "bolt",
+    "layout-grid",
+    "layout-list",
+    "layout-dashboard",
+    "puzzle"
+  ];
+  var SPACING_MIN = -16;
+  var SPACING_MAX = 16;
+  var HOVER_RADIUS_MIN = 0;
+  var HOVER_RADIUS_MAX = 16;
+  var ACTIVE_INSTANCE_KEY = "__plgSbmActiveInstance";
+  var ITEM_MODE_OPTIONS = [
+    { value: MODES.SHOW, label: "Show" },
+    { value: MODES.HOVER, label: "On hover" },
+    { value: MODES.BARTENDER, label: "On click" },
+    { value: MODES.HIDE, label: "Hide" }
+  ];
+  var TELEMETRY_ENDPOINT = "https://thymer-plugins.goatcounter.com/count";
+  var TELEMETRY_SCRIPT_SRC = "https://gc.zgo.at/count.js";
+  var _telemetryScriptPromise = null;
+  function _loadGoatCounter() {
+    if (_telemetryScriptPromise) return _telemetryScriptPromise;
+    _telemetryScriptPromise = new Promise((resolve) => {
+      window.goatcounter = window.goatcounter || {};
+      window.goatcounter.no_onload = true;
+      window.goatcounter.allow_local = false;
+      if (typeof window.goatcounter.count === "function") {
+        resolve();
+        return;
+      }
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = TELEMETRY_SCRIPT_SRC;
+      s.setAttribute("data-goatcounter", TELEMETRY_ENDPOINT);
+      s.setAttribute("data-goatcounter-settings", '{"no_onload": true}');
+      s.onload = () => resolve();
+      s.onerror = () => resolve();
+      document.head.appendChild(s);
+    });
+    return _telemetryScriptPromise;
+  }
+  __name(_loadGoatCounter, "_loadGoatCounter");
+  function _fireTelemetry(path) {
+    _loadGoatCounter().then(() => {
+      try {
+        window.goatcounter.count({ path, title: "", event: false });
+      } catch (_) {
+      }
+    });
+  }
+  __name(_fireTelemetry, "_fireTelemetry");
+  function _telemetryBlocked() {
+    try {
+      if (navigator.doNotTrack === "1") return true;
+      if (localStorage.getItem("tps-telemetry-opt-out") === "1") return true;
+    } catch (_) {
+      return true;
+    }
+    return false;
+  }
+  __name(_telemetryBlocked, "_telemetryBlocked");
+  function pingInstall(slug) {
+    try {
+      if (_telemetryBlocked()) return;
+      const key = "tps-tcm-" + slug;
+      if (localStorage.getItem(key) === "1") return;
+      localStorage.setItem(key, "1");
+      _fireTelemetry("thymer-" + slug);
+    } catch (_) {
+    }
+  }
+  __name(pingInstall, "pingInstall");
+  function pingActive(slug) {
+    try {
+      if (_telemetryBlocked()) return;
+      const today = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+      const key = "tps-act-" + slug;
+      if (localStorage.getItem(key) === today) return;
+      localStorage.setItem(key, today);
+      _fireTelemetry("thymer-" + slug + "/active");
+    } catch (_) {
+    }
+  }
+  __name(pingActive, "pingActive");
+  var Plugin = class extends AppPlugin {
+    static {
+      __name(this, "Plugin");
+    }
+    onLoad() {
+      pingInstall("status-bar-manager");
+      pingActive("status-bar-manager");
+      void syncPluginVersionOnLoad(this, PLUGIN_VERSION);
+      this._handlerIds = [];
+      this._statusItem = null;
+      this._commandItem = null;
+      this._panelEl = null;
+      this._barObserver = null;
+      this._resizeHandler = null;
+      this._hoverOverlayEl = null;
+      this._hoverMouseOverHandler = null;
+      this._hoverMouseOutHandler = null;
+      this._hoverMouseMoveHandler = null;
+      this._documentPointerDownHandler = null;
+      this._hoverCloseTimer = null;
+      this._bartenderCloseTimer = null;
+      this._configSaveTimer = null;
+      this._configSaveInFlight = false;
+      this._configSaveQueued = false;
+      this._renderRaf = 0;
+      this._panelOpenPromise = null;
+      this._wsGuid = null;
+      this._tooltipEditRows = /* @__PURE__ */ new Set();
+      try {
+        /** @type {any} */
+        window[ACTIVE_INSTANCE_KEY] = this;
+      } catch {
+      }
+      this._state = this._loadState();
+      this._handlerIds.push(this.events.on("panel.closed", (e) => {
+        try {
+          const p = e && e.panel;
+          if (p && typeof p.getType === "function" && p.getType() === PANEL_TYPE) {
+            this._flushConfigSave();
+          }
+        } catch {
+        }
+      }));
+      this.ui.injectCSS(PANEL_CSS);
+      this._injectStaticCSS();
+      this._statusItem = this.ui.addStatusBarItem({
+        icon: this._state.triggerIcon || DEFAULT_STATE.triggerIcon,
+        tooltip: "Status Bar Manager",
+        onClick: /* @__PURE__ */ __name(() => {
+        }, "onClick")
+      });
+      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
+      if (triggerEl) {
+        triggerEl.classList.add(TRIGGER_CLASS);
+        triggerEl.setAttribute("data-tooltip", "Status Bar Manager");
+        triggerEl.setAttribute("data-tooltip-dir", "top");
+        triggerEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          this._openPanel();
+        }, true);
+      }
+      this._commandItem = this.ui.addCommandPaletteCommand({
+        label: "Plugin: Status Bar Manager",
+        icon: "adjustments",
+        onSelected: /* @__PURE__ */ __name(() => this._openPanel(), "onSelected")
+      });
+      this.ui.registerCustomPanelType(PANEL_TYPE, (pluginPanel) => {
+        try {
+          pluginPanel.setTitle("Configure Status Bar Manager");
+        } catch {
+        }
+        const el = pluginPanel.getElement();
+        if (!el) return;
+        this._panelEl = el;
+        this._renderPanel();
+      });
+      this._applySpacing();
+      this._applyIconOnly();
+      this._applyHoverRadius();
+      this._applyUniformHover();
+      this._applySplitHoverZones();
+      this._scheduleApplyItems();
+      this._observeBar();
+    }
+    onUnload() {
+      for (const id of this._handlerIds || []) this.events.off(id);
+      this._handlerIds = [];
+      if (this._barObserver) {
+        this._barObserver.disconnect();
+        this._barObserver = null;
+      }
+      if (this._resizeHandler) {
+        window.removeEventListener("resize", this._resizeHandler);
+        this._resizeHandler = null;
+      }
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (bar instanceof HTMLElement && this._hoverMouseOverHandler) {
+        bar.removeEventListener("mouseover", this._hoverMouseOverHandler, true);
+      }
+      if (bar instanceof HTMLElement && this._hoverMouseOutHandler) {
+        bar.removeEventListener("mouseout", this._hoverMouseOutHandler, true);
+      }
+      if (bar instanceof HTMLElement && this._hoverMouseMoveHandler) {
+        bar.removeEventListener("mousemove", this._hoverMouseMoveHandler, true);
+      }
+      if (this._documentPointerDownHandler) {
+        document.removeEventListener("pointerdown", this._documentPointerDownHandler, true);
+      }
+      this._hoverMouseOverHandler = null;
+      this._hoverMouseOutHandler = null;
+      this._hoverMouseMoveHandler = null;
+      this._documentPointerDownHandler = null;
+      if (this._hoverCloseTimer) {
+        clearTimeout(this._hoverCloseTimer);
+        this._hoverCloseTimer = null;
+      }
+      if (this._bartenderCloseTimer) {
+        clearTimeout(this._bartenderCloseTimer);
+        this._bartenderCloseTimer = null;
+      }
+      this._flushConfigSave();
+      if (this._hoverOverlayEl) {
+        this._hoverOverlayEl.remove();
+        this._hoverOverlayEl = null;
+      }
+      if (this._renderRaf) {
+        cancelAnimationFrame(this._renderRaf);
+        this._renderRaf = 0;
+      }
+      document.body.classList.remove(
+        BODY_BARTENDER_OPEN,
+        BODY_BARTENDER_CLOSING,
+        BODY_ICON_ONLY_PLUGINS,
+        BODY_ICON_ONLY_SHORTCUTS,
+        BODY_CUSTOM_SPACING,
+        BODY_UNIFORM_HOVER,
+        BODY_SPLIT_HOVER_ZONES
+      );
+      document.body.style.removeProperty("--plg-sbm-icon-gap");
+      document.body.style.removeProperty("--plg-sbm-bar-h");
+      this._clearHoverMetrics();
+      this._clearHoverSide(false);
+      for (const el of document.querySelectorAll(`[data-sbm-mode]`)) el.removeAttribute("data-sbm-mode");
+      for (const el of document.querySelectorAll(`[data-sbm-force-show]`)) el.removeAttribute("data-sbm-force-show");
+      for (const el of document.querySelectorAll("[data-sbm-original-tooltip]")) {
+        if (!(el instanceof HTMLElement)) continue;
+        const orig = el.getAttribute("data-sbm-original-tooltip");
+        if (orig) el.setAttribute("data-tooltip", orig);
+        el.removeAttribute("data-sbm-original-tooltip");
+      }
+      for (const el of document.querySelectorAll("[data-sbm-key]")) {
+        if (el instanceof HTMLElement) {
+          el.style.order = "";
+          el.style.removeProperty("--plg-sbm-reveal-delay");
+        }
+        el.removeAttribute("data-sbm-key");
+      }
+      for (const el of document.querySelectorAll(`${LEFT_SELECTOR} > .statusbar-item`)) {
+        if (el instanceof HTMLElement) el.style.removeProperty("--plg-sbm-reveal-delay");
+      }
+      for (const el of document.querySelectorAll('[data-sbm-added-tooltip-class="true"]')) {
+        el.classList.remove("tooltip");
+        el.removeAttribute("data-sbm-added-tooltip-class");
+      }
+      if (this._statusItem) {
+        this._statusItem.remove();
+        this._statusItem = null;
+      }
+      if (this._commandItem) {
+        this._commandItem.remove();
+        this._commandItem = null;
+      }
+      this._panelEl = null;
+      this._panelOpenPromise = null;
+      try {
+        const w = (
+          /** @type {any} */
+          window
+        );
+        if (w[ACTIVE_INSTANCE_KEY] === this) w[ACTIVE_INSTANCE_KEY] = null;
+      } catch {
+      }
+    }
+    _toggleBartenderDrawer() {
+      if (document.body.classList.contains(BODY_BARTENDER_OPEN)) this._closeBartenderDrawer(true);
+      else this._openBartenderDrawer();
+    }
+    _openBartenderDrawer() {
+      if (this._bartenderCloseTimer) {
+        clearTimeout(this._bartenderCloseTimer);
+        this._bartenderCloseTimer = null;
+      }
+      document.body.classList.remove(BODY_BARTENDER_CLOSING);
+      document.body.classList.add(BODY_BARTENDER_OPEN);
+    }
+    /** @param {boolean} animate */
+    _closeBartenderDrawer(animate) {
+      if (this._bartenderCloseTimer) {
+        clearTimeout(this._bartenderCloseTimer);
+        this._bartenderCloseTimer = null;
+      }
+      if (!document.body.classList.contains(BODY_BARTENDER_OPEN)) {
+        document.body.classList.remove(BODY_BARTENDER_CLOSING);
+        return;
+      }
+      document.body.classList.remove(BODY_BARTENDER_OPEN);
+      if (!animate) {
+        document.body.classList.remove(BODY_BARTENDER_CLOSING);
+        return;
+      }
+      document.body.classList.add(BODY_BARTENDER_CLOSING);
+      this._bartenderCloseTimer = setTimeout(() => {
+        this._bartenderCloseTimer = null;
+        document.body.classList.remove(BODY_BARTENDER_CLOSING);
+      }, HOVER_ANIM_MS);
+    }
+    _hasBartenderItems() {
+      const modes = this._state.modes || {};
+      for (const k of Object.keys(modes)) {
+        if (modes[k] === MODES.BARTENDER) return true;
+      }
+      return false;
+    }
+    async _openPanel() {
+      if (this._panelEl && document.contains(this._panelEl)) return;
+      if (this._panelOpenPromise) return this._panelOpenPromise;
+      this._panelOpenPromise = (async () => {
+        try {
+          const p = await this.ui.createPanel();
+          if (p) p.navigateToCustomType(PANEL_TYPE);
+        } finally {
+          this._panelOpenPromise = null;
+        }
+      })();
+      return this._panelOpenPromise;
+    }
+    // ── CSS (rules that apply to the live bar) ──────────────────────────────
+    _injectStaticCSS() {
+      this.ui.injectCSS(`
+				/* \u2500\u2500 Trigger appearance \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+				   Keep native statusbar item geometry intact. Cursor only. */
+			.${TRIGGER_CLASS} {
+				cursor: pointer !important;
+			}
+			.${TRIGGER_CLASS}:hover,
+			.${TRIGGER_CLASS}:active,
+			.${TRIGGER_CLASS}:focus {
+				transform: none !important;
+				translate: none !important;
+			}
+			/* Anchor the right column to the right edge of the bar so collapsing
+			   the keyboard-shortcut column doesn't drag the icons leftward. */
+			${BAR_SELECTOR} ${RIGHT_SELECTOR} {
+				margin-left: auto !important;
+			}
+
+			/* \u2500\u2500 Per-item mode rules \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+			body ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--markdown-mirror[data-sbm-force-show="true"],
+			body ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--mcp-bridge[data-sbm-force-show="true"],
+			body ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--hotreload[data-sbm-force-show="true"] {
+				display: flex !important;
+			}
+
+			body ${BAR_SELECTOR} > [data-sbm-mode="${MODES.HIDE}"],
+			body ${BAR_SELECTOR} [data-sbm-mode="${MODES.HIDE}"] { display: none !important; }
+
+			body ${BAR_SELECTOR} > [data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR} [data-sbm-mode="${MODES.HOVER}"] { display: none !important; }
+
+			body ${BAR_SELECTOR} > [data-sbm-mode="${MODES.BARTENDER}"],
+			body ${BAR_SELECTOR} [data-sbm-mode="${MODES.BARTENDER}"] { display: none !important; }
+
+			/* Hover mode reuses drawer reveal/close motion. Without split zones, any
+			   bar hover opens both sides. With split zones, only the hovered half opens. */
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-closing-side="left"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] {
+				display: flex !important;
+			}
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-closing-side="left"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-closing-side="right"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body:not(.${BODY_SPLIT_HOVER_ZONES}) ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_SPLIT_HOVER_ZONES} ${BAR_SELECTOR}[data-sbm-hover-closing-side="right"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"] {
+				display: flex !important;
+			}
+
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"] {
+				animation: plg-sbm-slide-in-left ${HOVER_ANIM_MS}ms cubic-bezier(0.2,0.6,0.2,1);
+			}
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"] {
+				animation: plg-sbm-slide-in-right ${HOVER_ANIM_MS}ms cubic-bezier(0.2,0.6,0.2,1);
+			}
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="left"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="left"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"] {
+				animation: plg-sbm-slide-out-left ${HOVER_ANIM_MS}ms cubic-bezier(0.4,0,0.2,1);
+			}
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="right"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="all"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-closing-side="right"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"] {
+				animation: plg-sbm-slide-out-right ${HOVER_ANIM_MS}ms cubic-bezier(0.4,0,0.2,1);
+			}
+
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR}[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${LEFT_SELECTOR}[data-sbm-mode="${MODES.BARTENDER}"] {
+				display: flex !important;
+			}
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.BARTENDER}"] {
+				display: flex !important;
+			}
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR}[data-sbm-mode="${MODES.BARTENDER}"] > .statusbar-item,
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"] {
+				animation: plg-sbm-slide-in-left ${HOVER_ANIM_MS}ms cubic-bezier(0.2,0.6,0.2,1);
+			}
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.BARTENDER}"] {
+				animation: plg-sbm-slide-in-right ${HOVER_ANIM_MS}ms cubic-bezier(0.2,0.6,0.2,1);
+			}
+
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR}[data-sbm-mode="${MODES.HOVER}"] > .statusbar-item,
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="left"] ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="all"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body ${BAR_SELECTOR}[data-sbm-hover-side="right"] ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.HOVER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR}[data-sbm-mode="${MODES.BARTENDER}"] > .statusbar-item,
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_OPEN} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.BARTENDER}"] {
+				animation-fill-mode: both;
+				animation-delay: var(--plg-sbm-reveal-delay, 0ms);
+			}
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${LEFT_SELECTOR}[data-sbm-mode="${MODES.BARTENDER}"] > .statusbar-item,
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${LEFT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"] {
+				animation: plg-sbm-slide-out-left ${HOVER_ANIM_MS}ms cubic-bezier(0.4,0,0.2,1);
+			}
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item[data-sbm-mode="${MODES.BARTENDER}"],
+			body.${BODY_BARTENDER_CLOSING} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users[data-sbm-mode="${MODES.BARTENDER}"] {
+				animation: plg-sbm-slide-out-right ${HOVER_ANIM_MS}ms cubic-bezier(0.4,0,0.2,1);
+			}
+
+			/* Bartender drawer-open state: trigger inherits theme accent \u2014 we use
+			   currentColor with a brightness boost rather than --logo-color so it
+			   tracks the active theme/vibe instead of the default mint. */
+			body.${BODY_BARTENDER_OPEN} .${TRIGGER_CLASS} {
+				filter: brightness(1.4);
+			}
+
+			/* \u2500\u2500 Icon-only modes \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+			body.${BODY_ICON_ONLY_PLUGINS} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item .statusbar-item--label {
+				display: none !important;
+			}
+			body.${BODY_ICON_ONLY_SHORTCUTS} ${BAR_SELECTOR} ${LEFT_SELECTOR} .statusbar--kbd-label {
+				display: none !important;
+			}
+
+			/* \u2500\u2500 Custom spacing (supports negative for overlap) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+			body.${BODY_CUSTOM_SPACING} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item + .statusbar-item,
+			body.${BODY_CUSTOM_SPACING} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item + .statusbar-item {
+				margin-left: var(--plg-sbm-icon-gap, 4px) !important;
+			}
+
+				/* \u2500\u2500 Uniform hover (visual only, no layout reflow) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+				   Native item display/alignment stays untouched. A single measured
+				   overlay inside the bar paints the full-height hover background,
+				   so logo transforms and tooltip arrows keep their original boxes. */
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} {
+					position: relative !important;
+				}
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} .${HOVER_OVERLAY_CLASS} {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: var(--plg-sbm-hover-width, 0px);
+					height: var(--plg-sbm-bar-h, 100%);
+					transform: translateX(var(--plg-sbm-hover-left, 0px));
+					background: color-mix(in srgb, var(--text-default, currentColor) 16%, transparent) !important;
+					border-radius: var(--plg-sbm-hover-radius, 0px) !important;
+					pointer-events: none;
+					opacity: 0;
+					z-index: 0;
+					transition:
+						opacity 120ms cubic-bezier(0.2, 0.6, 0.2, 1),
+						transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+						width 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+				}
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} .${HOVER_OVERLAY_CLASS}.is-visible {
+					opacity: 1;
+				}
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR},
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR},
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users {
+					position: relative !important;
+					z-index: 1;
+				}
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item *,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item *,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users * {
+					cursor: pointer !important;
+				}
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item:hover,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item:hover,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users:hover,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item:active,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item:active,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users:active,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item:focus,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item:focus,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users:focus,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar-item:hover *,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${LEFT_SELECTOR}  > .statusbar-item:hover *,
+				body.${BODY_UNIFORM_HOVER} ${BAR_SELECTOR} ${RIGHT_SELECTOR} > .statusbar--users:hover * {
+					background: transparent !important;
+					background-color: transparent !important;
+					box-shadow: none !important;
+				}
+
+			@keyframes plg-sbm-slide-in-right {
+				from { opacity: 0; transform: translateX(12px); }
+				to   { opacity: 1; transform: translateX(0); }
+			}
+			@keyframes plg-sbm-slide-out-right {
+				from { opacity: 1; transform: translateX(0); }
+				to   { opacity: 0; transform: translateX(12px); }
+			}
+			@keyframes plg-sbm-slide-in-left {
+				from { opacity: 0; transform: translateX(-12px); }
+				to   { opacity: 1; transform: translateX(0); }
+			}
+			@keyframes plg-sbm-slide-out-left {
+				from { opacity: 1; transform: translateX(0); }
+				to   { opacity: 0; transform: translateX(-12px); }
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				body ${BAR_SELECTOR} [data-sbm-mode="${MODES.HOVER}"],
+				body ${BAR_SELECTOR} [data-sbm-mode="${MODES.BARTENDER}"] {
+					animation-duration: 1ms !important;
+					transform: none !important;
+				}
+			}
+
+				/* \u2500\u2500 Settings panel \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+				.${PANEL_CLASS} {
+					container-type: inline-size;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__row-icon {
+					display: inline-flex; align-items: center; justify-content: center;
+				width: 18px; height: 30px;
+				color: var(--text-muted, currentColor);
+				font-size: 14px;
+				line-height: 1;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__row-icon--blank { opacity: 0.25; }
+			.${PANEL_CLASS} .${PANEL_CLASS}__align {
+				display: flex; align-items: center; justify-content: space-between;
+				gap: 12px;
+				padding: 8px 0;
+			}
+				.${PANEL_CLASS} .tps-list-row {
+					grid-template-columns: 18px minmax(160px, 1fr) minmax(220px, auto);
+					gap: 6px 12px;
+					padding: 10px 0;
+					align-items: center;
+					position: relative;
+					z-index: 0;
+				}
+				.${PANEL_CLASS} .tps-list-name {
+					min-width: 0;
+					overflow: visible;
+					white-space: normal;
+				}
+				/* Make sure the controls cell sits above the input so its click
+				   targets are never intercepted by an adjacent stretching element. */
+			.${PANEL_CLASS} .tps-list-row > div:last-child,
+			.${PANEL_CLASS} .${PANEL_CLASS}__row-controls,
+			.${PANEL_CLASS} .${PANEL_CLASS}__row-controls * {
+				position: relative;
+				z-index: 2;
+				pointer-events: auto;
+			}
+				.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-input {
+					max-width: 100%;
+				}
+				.${PANEL_CLASS} .tps-list-row[data-sbm-has-tooltip="true"] {
+					align-items: end;
+				}
+				.${PANEL_CLASS} .tps-list-row[data-sbm-has-tooltip="true"] > div:first-child,
+				.${PANEL_CLASS} .tps-list-row[data-sbm-has-tooltip="true"] > div:last-child {
+					align-self: end;
+					min-height: 30px;
+					display: flex;
+					align-items: center;
+				}
+			.${PANEL_CLASS} .tps-list-row[data-sbm-row-mode="${MODES.HIDE}"],
+			.${PANEL_CLASS} .tps-list-row[data-sbm-row-mode="${MODES.BARTENDER}"] {
+				opacity: 0.45;
+			}
+			.${PANEL_CLASS} .tps-list-row[data-sbm-row-mode="${MODES.HOVER}"] {
+				opacity: 0.7;
+			}
+			/* Keep the buttons interactive even when the row is faded \u2014 opacity
+			   alone never blocks clicks, but defensive specificity here helps
+			   guarantee Show/Hide/Hover/Drawer always respond. */
+			.${PANEL_CLASS} .tps-list-row[data-sbm-row-mode] .tps-tab,
+			.${PANEL_CLASS} .tps-list-row[data-sbm-row-mode] .${PANEL_CLASS}__drag-handle {
+				pointer-events: auto !important;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__icon-picker {
+				display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 0;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__icon-btn {
+				display: inline-flex; align-items: center; justify-content: center;
+				width: 36px; height: 36px;
+				border-radius: 6px;
+				background: transparent;
+				border: 1px solid var(--tps-divider, color-mix(in srgb, currentColor 14%, transparent));
+				color: var(--text-muted, currentColor);
+				font-size: 18px;
+				cursor: pointer;
+				padding: 0;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__icon-btn:hover {
+				background: var(--tps-bg-hover, color-mix(in srgb, currentColor 8%, transparent));
+				color: var(--text-default, currentColor);
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__icon-btn[aria-pressed="true"] {
+				border-color: currentColor;
+				color: inherit;
+			}
+				.${PANEL_CLASS} .${PANEL_CLASS}__row-controls {
+					display: inline-flex;
+					align-items: center;
+					justify-content: flex-end;
+					gap: 8px;
+					min-width: 0;
+					width: 100%;
+					min-height: 30px;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__row-controls .tps-tabs {
+					flex-wrap: wrap;
+					justify-content: flex-end;
+					min-width: 0;
+					align-items: center;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__row-controls .tps-tab {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					height: 30px;
+					cursor: pointer !important;
+				}
+				.${PANEL_CLASS} button,
+				.${PANEL_CLASS} .tps-tab,
+				.${PANEL_CLASS} .${PANEL_CLASS}__icon-btn {
+					cursor: pointer !important;
+				}
+
+				/* Active mode tab gets a mode-specific colour so the selected
+				   state reads at a glance: show=green, hover=yellow, click=orange,
+				   hide=red. Uses Thymer's enum tokens with rgba fallbacks. */
+				.${PANEL_CLASS} .tps-tab[data-sbm-mode-opt="${MODES.SHOW}"][aria-pressed="true"] {
+					background: var(--enum-green-bg, rgba(34,197,94,0.16));
+					color: var(--enum-green-fg, #15803d);
+					border-color: var(--enum-green-border, rgba(34,197,94,0.5));
+				}
+				.${PANEL_CLASS} .tps-tab[data-sbm-mode-opt="${MODES.HOVER}"][aria-pressed="true"] {
+					background: var(--enum-yellow-bg, rgba(234,179,8,0.16));
+					color: var(--enum-yellow-fg, #a16207);
+					border-color: var(--enum-yellow-border, rgba(234,179,8,0.5));
+				}
+				.${PANEL_CLASS} .tps-tab[data-sbm-mode-opt="${MODES.BARTENDER}"][aria-pressed="true"] {
+					background: var(--enum-orange-bg, rgba(249,115,22,0.16));
+					color: var(--enum-orange-fg, #c2410c);
+					border-color: var(--enum-orange-border, rgba(249,115,22,0.5));
+				}
+				.${PANEL_CLASS} .tps-tab[data-sbm-mode-opt="${MODES.HIDE}"][aria-pressed="true"] {
+					background: var(--enum-red-bg, rgba(239,68,68,0.16));
+					color: var(--enum-red-fg, #b91c1c);
+					border-color: var(--enum-red-border, rgba(239,68,68,0.5));
+				}
+
+				/* Column-header row for the Right side \u2014 bulk controls above the
+				   item list, its buttons aligned over each item's buttons. */
+				.${PANEL_CLASS} .tps-list-row[data-sbm-set-all="true"] {
+					border-bottom: 1px solid var(--border-default, rgba(127,127,127,0.14));
+					margin-bottom: 4px;
+					padding-bottom: 8px;
+				}
+				/* Spacer that occupies the same width as an item row's drag handle
+				   so the header's mode tabs line up above the item tabs. */
+				.${PANEL_CLASS} .${PANEL_CLASS}__drag-spacer {
+					width: 20px;
+					height: 24px;
+					flex-shrink: 0;
+					pointer-events: none;
+				}
+
+			/* \u2500\u2500 Drag handle (6 dots) on the far right of each reorderable row */
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle {
+				display: inline-flex; align-items: center; justify-content: center;
+				width: 20px; height: 24px;
+				background: transparent; border: 0; padding: 0;
+				color: var(--text-muted, currentColor);
+				cursor: grab;
+				opacity: 0.55;
+				transition: opacity 120ms ease, color 120ms ease;
+				touch-action: none;
+				user-select: none;
+				flex-shrink: 0;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle:hover {
+				opacity: 1;
+				color: inherit;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle:active,
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle.is-dragging {
+				cursor: grabbing;
+			}
+			/* Per-row "edit tooltip" toggle \u2014 matches the drag handle's weight. */
+			.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-toggle {
+				display: inline-flex; align-items: center; justify-content: center;
+				width: 24px; height: 24px;
+				background: transparent; border: 0; padding: 0;
+				color: var(--text-muted, currentColor);
+				cursor: pointer;
+				opacity: 0.55;
+				border-radius: 4px;
+				transition: opacity 120ms ease, color 120ms ease, background-color 120ms ease;
+				flex-shrink: 0;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-toggle:hover { opacity: 1; }
+			.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-toggle[aria-pressed="true"] {
+				opacity: 1;
+				color: var(--enum-blue-fg, #1d4ed8);
+				background: var(--enum-blue-bg, rgba(59,130,246,0.16));
+			}
+			/* SVG-free 6-dot grip drawn with a tight 2\xD73 grid of pseudo-circles. */
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-grip {
+				display: grid;
+				grid-template-columns: 3px 3px;
+				grid-template-rows: 3px 3px 3px;
+				gap: 3px;
+				pointer-events: none;
+			}
+			.${PANEL_CLASS} .${PANEL_CLASS}__drag-grip span {
+				width: 3px; height: 3px;
+				background: currentColor;
+				border-radius: 50%;
+			}
+
+			/* Drop-target indicators while dragging. */
+			.${PANEL_CLASS} .tps-list-row.is-drag-source { opacity: 0.35; }
+			.${PANEL_CLASS} .tps-list-row.is-drop-above {
+				box-shadow: inset 0 2px 0 0 currentColor;
+			}
+			.${PANEL_CLASS} .tps-list-row.is-drop-below {
+				box-shadow: inset 0 -2px 0 0 currentColor;
+			}
+
+			/* Editable tooltip input below each row label when override is on. */
+				.${PANEL_CLASS} .${PANEL_CLASS}__name-stack {
+					display: flex;
+					flex-direction: column;
+					gap: 4px;
+					min-width: 0;
+					width: 100%;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__row-label {
+					font: inherit;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-input {
+					font: inherit;
+					background: var(--tps-panel-bg, color-mix(in srgb, currentColor 4%, transparent));
+					border: 1px solid var(--tps-divider, color-mix(in srgb, currentColor 14%, transparent));
+					border-radius: 4px;
+					padding: 4px 6px;
+					color: inherit;
+					outline: none;
+					width: 100%;
+					min-width: 0;
+					height: 30px;
+					box-sizing: border-box;
+				}
+				.${PANEL_CLASS} .${PANEL_CLASS}__tooltip-input:focus {
+					border-color: currentColor;
+				}
+
+				@container (max-width: 620px) {
+					.${PANEL_CLASS} .tps-list-row {
+						grid-template-columns: 18px minmax(0, 1fr);
+						grid-template-areas:
+							"icon name"
+							". controls";
+						align-items: start;
+						gap: 8px 12px;
+						padding: 12px 0;
+					}
+					.${PANEL_CLASS} .tps-list-row > div:first-child { grid-area: icon; padding-top: 4px; }
+					.${PANEL_CLASS} .tps-list-row[data-sbm-has-tooltip="true"] > div:first-child { padding-top: 0; }
+					.${PANEL_CLASS} .tps-list-row > div:nth-child(2) { grid-area: name; min-width: 0; width: 100%; }
+					.${PANEL_CLASS} .tps-list-row > div:last-child {
+						grid-area: controls;
+						width: 100%;
+						justify-self: stretch;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__row-controls {
+						justify-content: flex-start;
+						align-items: center;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__row-controls .tps-tabs {
+						display: grid;
+						grid-template-columns: repeat(4, minmax(0, 1fr));
+						width: min(100%, 360px);
+						justify-content: stretch;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__row-controls .tps-tab {
+						min-width: 0;
+						padding-inline: 6px;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle {
+						margin-left: auto;
+					}
+				}
+
+				@container (max-width: 380px) {
+					.${PANEL_CLASS} .${PANEL_CLASS}__row-controls {
+						align-items: flex-start;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__row-controls .tps-tabs {
+						grid-template-columns: repeat(2, minmax(0, 1fr));
+						width: 100%;
+					}
+					.${PANEL_CLASS} .${PANEL_CLASS}__drag-handle {
+						height: 32px;
+					}
+				}
+			`);
+    }
+    // ── Apply state to the live DOM ─────────────────────────────────────────
+    _applySpacing() {
+      const px = Math.max(SPACING_MIN, Math.min(SPACING_MAX, Number(this._state.spacing) || 0));
+      if (px !== 0) {
+        document.body.classList.add(BODY_CUSTOM_SPACING);
+        document.body.style.setProperty("--plg-sbm-icon-gap", `${px}px`);
+      } else {
+        document.body.classList.remove(BODY_CUSTOM_SPACING);
+        document.body.style.removeProperty("--plg-sbm-icon-gap");
+      }
+    }
+    _applyIconOnly() {
+      document.body.classList.toggle(BODY_ICON_ONLY_PLUGINS, !!this._state.iconOnlyPlugins);
+      document.body.classList.toggle(BODY_ICON_ONLY_SHORTCUTS, !!this._state.iconOnlyShortcuts);
+    }
+    _applyHoverRadius() {
+      const px = Math.max(HOVER_RADIUS_MIN, Math.min(HOVER_RADIUS_MAX, Number(this._state.hoverRadius) || 0));
+      document.body.style.setProperty("--plg-sbm-hover-radius", `${px}px`);
+    }
+    _applyUniformHover() {
+      const enable = !!this._state.uniformHover;
+      document.body.classList.toggle(BODY_UNIFORM_HOVER, enable);
+      const targets = this._statusbarHoverTargets();
+      if (enable) {
+        this._ensureHoverOverlay();
+        this._syncHoverMetrics(targets);
+      } else {
+        this._hideHoverOverlay();
+        this._clearHoverMetrics(targets);
+      }
+    }
+    _applySplitHoverZones() {
+      document.body.classList.toggle(BODY_SPLIT_HOVER_ZONES, !!this._state.splitHoverZones);
+    }
+    /**
+     * Statusbar items keep their native display/alignment. These targets only
+     * receive measured CSS variables used by the pseudo-element hover layer.
+     * @returns {HTMLElement[]}
+     */
+    _statusbarHoverTargets() {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return [];
+      const targets = [];
+      const seen = /* @__PURE__ */ new Set();
+      const collect = /* @__PURE__ */ __name((selector) => {
+        for (const el of bar.querySelectorAll(selector)) {
+          if (!(el instanceof HTMLElement)) continue;
+          if (seen.has(el)) continue;
+          seen.add(el);
+          targets.push(el);
+        }
+      }, "collect");
+      collect(`${RIGHT_SELECTOR} > .statusbar-item`);
+      collect(`${RIGHT_SELECTOR} > .statusbar--users`);
+      collect(`${LEFT_SELECTOR} > .statusbar-item`);
+      return targets;
+    }
+    /** @param {HTMLElement[]=} targets */
+    _clearHoverMetrics(targets = this._statusbarHoverTargets()) {
+      document.body.style.removeProperty("--plg-sbm-bar-h");
+      for (const el of targets) {
+        el.classList.remove(HOVER_TAG_CLASS);
+      }
+    }
+    /** @param {HTMLElement[]=} targets */
+    _syncHoverMetrics(targets = this._statusbarHoverTargets()) {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return;
+      const barRect = bar.getBoundingClientRect();
+      if (!barRect.height) return;
+      document.body.style.setProperty("--plg-sbm-bar-h", `${barRect.height}px`);
+      for (const el of targets) {
+        const rect = el.getBoundingClientRect();
+        if (!rect.width && !rect.height) continue;
+        el.classList.add(HOVER_TAG_CLASS);
+      }
+    }
+    /** @returns {HTMLElement|null} */
+    _ensureHoverOverlay() {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return null;
+      if (this._hoverOverlayEl && this._hoverOverlayEl.isConnected) return this._hoverOverlayEl;
+      const overlay = document.createElement("div");
+      overlay.className = HOVER_OVERLAY_CLASS;
+      overlay.setAttribute("aria-hidden", "true");
+      bar.prepend(overlay);
+      this._hoverOverlayEl = overlay;
+      return overlay;
+    }
+    _hideHoverOverlay() {
+      if (this._hoverOverlayEl) this._hoverOverlayEl.classList.remove("is-visible");
+    }
+    /** @param {MouseEvent} evt */
+    _setHoverSideFromPointer(evt) {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return;
+      const rect = bar.getBoundingClientRect();
+      if (!rect.width) return;
+      const side = this._state.splitHoverZones ? evt.clientX - rect.left < rect.width / 2 ? "left" : "right" : "all";
+      const prev = bar.getAttribute("data-sbm-hover-side");
+      if (prev === side) return;
+      if (prev) this._setHoverClosingSide(prev);
+      bar.setAttribute("data-sbm-hover-side", side);
+    }
+    /**
+     * @param {boolean} animate
+     */
+    _clearHoverSide(animate = true) {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return;
+      const prev = bar.getAttribute("data-sbm-hover-side");
+      bar.removeAttribute("data-sbm-hover-side");
+      if (animate && prev) this._setHoverClosingSide(prev);
+      else bar.removeAttribute("data-sbm-hover-closing-side");
+    }
+    /** @param {string} side */
+    _setHoverClosingSide(side) {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!(bar instanceof HTMLElement)) return;
+      if (this._hoverCloseTimer) clearTimeout(this._hoverCloseTimer);
+      bar.setAttribute("data-sbm-hover-closing-side", side);
+      this._hoverCloseTimer = setTimeout(() => {
+        this._hoverCloseTimer = null;
+        bar.removeAttribute("data-sbm-hover-closing-side");
+      }, HOVER_ANIM_MS);
+    }
+    /**
+     * @param {EventTarget|null} target
+     * @returns {HTMLElement|null}
+     */
+    _hoverTargetFromEvent(target) {
+      if (!(target instanceof Element)) return null;
+      const el = target.closest(`${RIGHT_SELECTOR} > .statusbar-item, ${RIGHT_SELECTOR} > .statusbar--users, ${LEFT_SELECTOR} > .statusbar-item`);
+      return el instanceof HTMLElement ? el : null;
+    }
+    /** @param {HTMLElement} target */
+    _showHoverOverlayFor(target) {
+      if (!document.body.classList.contains(BODY_UNIFORM_HOVER)) return;
+      const bar = document.querySelector(BAR_SELECTOR);
+      const overlay = this._ensureHoverOverlay();
+      if (!(bar instanceof HTMLElement) || !overlay) return;
+      const barRect = bar.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      if (!barRect.height || !targetRect.width) return;
+      document.body.style.setProperty("--plg-sbm-bar-h", `${barRect.height}px`);
+      overlay.style.setProperty("--plg-sbm-hover-left", `${targetRect.left - barRect.left}px`);
+      overlay.style.setProperty("--plg-sbm-hover-width", `${targetRect.width}px`);
+      overlay.classList.add("is-visible");
+    }
+    /**
+     * Thymer's tooltip arrow CSS expects the `.tooltip` class and data dir.
+     * Add that class only when missing, and mark it so unload can restore.
+     * @param {HTMLElement} el
+     */
+    _normalizeTooltipEl(el) {
+      if (!el.getAttribute("data-tooltip")) return;
+      el.setAttribute("data-tooltip-dir", "top");
+      if (!el.classList.contains("tooltip")) {
+        el.classList.add("tooltip");
+        el.setAttribute("data-sbm-added-tooltip-class", "true");
+      }
+    }
+    _scheduleApplyItems() {
+      if (this._renderRaf) return;
+      this._renderRaf = requestAnimationFrame(() => {
+        this._renderRaf = 0;
+        this._applyItems();
+        this._applyOrder();
+        this._applyUniformHover();
+        this._ensureTooltips();
+      });
+    }
+    /**
+     * Backfill `data-tooltip` / `data-tooltip-dir` on items that lack them.
+     * If overrideTooltips is enabled, FORCE-write tooltips on every item too —
+     * built-ins get our curated label; plugin items get a label derived from
+     * their existing tooltip (or short-fall to the data-cid). Either way, the
+     * tooltip arrow is always positioned via data-tooltip-dir="top".
+     */
+    _ensureTooltips() {
+      const force = !!this._state.overrideTooltips;
+      const overrides = this._state.tooltipOverrides || {};
+      for (const def of Object.values(BUILTIN)) {
+        for (const el of document.querySelectorAll(def.selector)) {
+          if (!(el instanceof HTMLElement)) continue;
+          const userOverride = def.key === BUILTIN.shortcuts.key ? "" : overrides[def.key];
+          if (userOverride) {
+            el.setAttribute("data-tooltip", userOverride);
+          } else if (force && def.tooltip) {
+            el.setAttribute("data-tooltip", def.tooltip);
+          } else if (!el.getAttribute("data-tooltip") && def.tooltip) {
+            el.setAttribute("data-tooltip", def.tooltip);
+          }
+          this._normalizeTooltipEl(el);
+        }
+      }
+      for (const item of this._discoverPluginItems()) {
+        const userOverride = overrides[item.key];
+        if (force) {
+          const tip = userOverride || this._shortLabel(item.el.getAttribute("data-tooltip") || "") || item.label;
+          if (tip) item.el.setAttribute("data-tooltip", tip);
+        } else if (userOverride) {
+          item.el.setAttribute("data-tooltip", userOverride);
+        }
+        this._normalizeTooltipEl(item.el);
+      }
+      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
+      if (triggerEl instanceof HTMLElement) {
+        const userOverride = overrides[TRIGGER_KEY];
+        triggerEl.setAttribute("data-tooltip", userOverride || "Status Bar Manager");
+        this._normalizeTooltipEl(triggerEl);
+      }
+      for (const el of document.querySelectorAll(`${BAR_SELECTOR} .statusbar-item, ${BAR_SELECTOR} .statusbar--users, ${BAR_SELECTOR} ${LEFT_SELECTOR}`)) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (!el.getAttribute("data-tooltip")) {
+          const fallback = el.getAttribute("title") || el.getAttribute("aria-label") || el.getAttribute("data-cid") || this._shortLabel(el.textContent || "");
+          if (fallback) el.setAttribute("data-tooltip", fallback);
+        }
+        this._normalizeTooltipEl(el);
+      }
+    }
+    /**
+     * Default mode for a key with no saved value: built-ins use their
+     * `DEFAULT_STATE.modes` entry (else Show); every discovered plugin item
+     * (`item:*`) defaults to Hide, so new plugins don't clutter the bar.
+     * @param {string} key @returns {ItemMode}
+     */
+    _defaultModeFor(key) {
+      const d = (
+        /** @type {Record<string, ItemMode>} */
+        DEFAULT_STATE.modes[key]
+      );
+      if (d) return d;
+      if (typeof key === "string" && key.startsWith("item:")) return (
+        /** @type {ItemMode} */
+        MODES.HIDE
+      );
+      return (
+        /** @type {ItemMode} */
+        MODES.SHOW
+      );
+    }
+    _applyItems() {
+      if (!this._isActiveInstance()) return;
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!bar) return;
+      for (const el of bar.querySelectorAll("[data-sbm-mode]")) el.removeAttribute("data-sbm-mode");
+      for (const el of bar.querySelectorAll("[data-sbm-force-show]")) el.removeAttribute("data-sbm-force-show");
+      const modes = this._state.modes || {};
+      for (const def of Object.values(BUILTIN)) {
+        const mode = modes[def.key] || this._defaultModeFor(def.key);
+        for (const el of bar.querySelectorAll(def.selector)) {
+          if (!(el instanceof HTMLElement)) continue;
+          if (mode === MODES.SHOW) {
+            if (def.key === BUILTIN.markdownMirror.key || def.key === BUILTIN.mcpBridge.key || def.key === BUILTIN.hotReload.key) {
+              el.setAttribute("data-sbm-force-show", "true");
+            }
+          } else {
+            el.setAttribute("data-sbm-mode", mode);
+          }
+        }
+      }
+      for (const item of this._discoverPluginItems()) {
+        const mode = modes[item.key] || this._defaultModeFor(item.key);
+        if (mode === MODES.SHOW) continue;
+        item.el.setAttribute("data-sbm-mode", mode);
+      }
+      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
+      if (triggerEl instanceof HTMLElement) {
+        const mode = modes[TRIGGER_KEY] || this._defaultModeFor(TRIGGER_KEY);
+        if (mode !== MODES.SHOW) triggerEl.setAttribute("data-sbm-mode", mode);
+      }
+    }
+    /**
+     * Apply the order map to the live bar. Tags each managed element with
+     * `data-sbm-key` and sets inline `style.order`. Items without an explicit
+     * order get a position derived from their discovery index, so a fresh
+     * install behaves identically to Thymer's default layout.
+     */
+    _applyOrder() {
+      const right = document.querySelector(RIGHT_SELECTOR);
+      if (!right) return;
+      const items = this._enumerateRightColumn();
+      const order = this._state.order || {};
+      const orderedItems = [];
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        const stored = order[it.key];
+        const value = typeof stored === "number" && Number.isFinite(stored) ? stored : it.key === TRIGGER_KEY ? 1e3 : i;
+        it.el.setAttribute("data-sbm-key", it.key);
+        it.el.style.order = String(value);
+        orderedItems.push({ el: it.el, value, index: i });
+      }
+      orderedItems.sort((a, b) => a.value - b.value || a.index - b.index).forEach((it, index) => {
+        it.el.style.setProperty("--plg-sbm-reveal-delay", `${index * REVEAL_STAGGER_MS}ms`);
+      });
+      const leftItems = document.querySelectorAll(`${LEFT_SELECTOR} > .statusbar-item`);
+      let leftIndex = 0;
+      for (const el of leftItems) {
+        if (!(el instanceof HTMLElement)) continue;
+        el.style.setProperty("--plg-sbm-reveal-delay", `${leftIndex * REVEAL_STAGGER_MS}ms`);
+        leftIndex++;
+      }
+    }
+    /**
+     * Enumerate every reorderable element in the right column with a stable key.
+     * Icon glyph is looked up live from the matched DOM element so the panel
+     * mirrors the EXACT glyph that ships in the bar (no random hardcoded
+     * substitutes).
+     *
+     * @returns {{ key: string, label: string, iconClass: string|null, el: HTMLElement }[]}
+     */
+    _enumerateRightColumn() {
+      const right = document.querySelector(RIGHT_SELECTOR);
+      if (!right) return [];
+      const out = [];
+      for (const def of Object.values(BUILTIN)) {
+        if (!def.reorderable) continue;
+        const el = right.querySelector(def.selector);
+        if (el instanceof HTMLElement) {
+          out.push({ key: def.key, label: def.label, iconClass: this._liveIcon(el) || def.icon, el });
+        }
+      }
+      for (const item of this._discoverPluginItems()) {
+        out.push(item);
+      }
+      const triggerEl = right.querySelector(`.${TRIGGER_CLASS}`);
+      if (triggerEl instanceof HTMLElement) {
+        const triggerIcon = this._liveIcon(triggerEl) || `ti-${this._state.triggerIcon || DEFAULT_STATE.triggerIcon}`;
+        out.push({ key: TRIGGER_KEY, label: "Status Bar Manager (this plugin)", iconClass: triggerIcon, el: triggerEl });
+      }
+      return out;
+    }
+    /**
+     * Read the `.statusbar-item--icon` glyph class out of an item element so
+     * the panel can render the exact same icon that's visible in the bar.
+     * @param {HTMLElement} el
+     * @returns {string|null}
+     */
+    _liveIcon(el) {
+      const iconEl = el.querySelector('.statusbar-item--icon, .ti, [class*="ti-"]');
+      if (!iconEl) return null;
+      return this._extractTiClass(iconEl.className);
+    }
+    /** @param {string} selector @returns {string|null} */
+    _liveIconBySelector(selector) {
+      const el = document.querySelector(selector);
+      if (!(el instanceof HTMLElement)) return null;
+      return this._liveIcon(el);
+    }
+    /** @returns {PluginItem[]} */
+    _discoverPluginItems() {
+      const right = document.querySelector(RIGHT_SELECTOR);
+      if (!right) return [];
+      const out = [];
+      const candidates = right.querySelectorAll(":scope > .statusbar-item");
+      for (const el of candidates) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (el.classList.contains(TRIGGER_CLASS)) continue;
+        if (el.classList.contains("statusbar--users")) continue;
+        if (el.classList.contains("id--sync")) continue;
+        if (el.classList.contains("statusbar--markdown-mirror")) continue;
+        if (el.classList.contains("statusbar--mcp-bridge")) continue;
+        if (el.classList.contains("statusbar--hotreload")) continue;
+        if (el.classList.contains("id--statusbar-msg")) continue;
+        if (el.getAttribute("event") === "onLogo") continue;
+        if (el.querySelector(":scope > .id--users-button")) continue;
+        if (!el.classList.contains("tooltip")) continue;
+        let original = el.getAttribute("data-sbm-original-tooltip");
+        const live = el.getAttribute("data-tooltip") || "";
+        if (!original && live) {
+          el.setAttribute("data-sbm-original-tooltip", live);
+          original = live;
+        }
+        const cid = el.getAttribute("data-cid") || "";
+        const iconEl = el.querySelector(".statusbar-item--icon");
+        const iconClass = iconEl ? this._extractTiClass(iconEl.className) : null;
+        const key = cid ? `item:${cid}` : `item:${original || live}`;
+        if (cid) this._migrateItemKey(`item:${original || live}`, key);
+        const override = (this._state.tooltipOverrides || {})[key];
+        const label = this._shortLabel(
+          override || original || live || el.getAttribute("aria-label") || el.getAttribute("title") || ""
+        ) || "(unnamed item)";
+        out.push({ key, label, iconClass, el });
+      }
+      return out;
+    }
+    /**
+     * One-time, best-effort migration of a plugin item's saved settings from the
+     * old tooltip-derived key to the stable cid key. Only copies when the new key
+     * has no value yet and the old key does, so it never clobbers newer edits.
+     * localStorage-only (no reload).
+     * @param {string} oldKey @param {string} newKey
+     */
+    _migrateItemKey(oldKey, newKey) {
+      if (!oldKey || oldKey === newKey) return;
+      const state = (
+        /** @type {Record<string, any>} */
+        this._state
+      );
+      let changed = false;
+      for (const bag of ["modes", "order", "tooltipOverrides"]) {
+        const map = state[bag];
+        if (map && map[oldKey] !== void 0 && map[newKey] === void 0) {
+          this._state = { ...this._state, [bag]: { ...map, [newKey]: map[oldKey] } };
+          changed = true;
+        }
+      }
+      if (changed) this._saveState();
+    }
+    /** @param {string} tooltip */
+    _shortLabel(tooltip) {
+      if (!tooltip) return "";
+      const cut = tooltip.split(/\s[–-]\s/)[0].trim();
+      return cut.length > 48 ? cut.slice(0, 47) + "\u2026" : cut;
+    }
+    /** @param {string} className @returns {string|null} */
+    _extractTiClass(className) {
+      const m = String(className || "").match(/\bti-[a-z0-9-]+/);
+      return m ? m[0] : null;
+    }
+    // ── Bar observer ────────────────────────────────────────────────────────
+    _observeBar() {
+      const bar = document.querySelector(BAR_SELECTOR);
+      if (!bar) {
+        setTimeout(() => this._observeBar(), 500);
+        return;
+      }
+      this._barObserver = new MutationObserver(() => this._scheduleApplyItems());
+      this._barObserver.observe(bar, { childList: true, subtree: true });
+      if (!this._resizeHandler) {
+        this._resizeHandler = () => this._applyUniformHover();
+        window.addEventListener("resize", this._resizeHandler);
+      }
+      if (!this._hoverMouseOverHandler) {
+        this._hoverMouseOverHandler = /** @type {EventListener} */
+        ((e) => {
+          const evt = (
+            /** @type {MouseEvent} */
+            e
+          );
+          this._setHoverSideFromPointer(evt);
+          const target = this._hoverTargetFromEvent(evt.target);
+          if (target) this._showHoverOverlayFor(target);
+        });
+        this._hoverMouseMoveHandler = /** @type {EventListener} */
+        ((e) => {
+          const evt = (
+            /** @type {MouseEvent} */
+            e
+          );
+          this._setHoverSideFromPointer(evt);
+          const target = this._hoverTargetFromEvent(evt.target);
+          if (target) this._showHoverOverlayFor(target);
+        });
+        this._hoverMouseOutHandler = /** @type {EventListener} */
+        ((e) => {
+          const evt = (
+            /** @type {MouseEvent} */
+            e
+          );
+          const next = this._hoverTargetFromEvent(evt.relatedTarget);
+          if (!next) this._hideHoverOverlay();
+          if (!(evt.relatedTarget instanceof Node) || !bar.contains(evt.relatedTarget)) {
+            this._clearHoverSide(true);
+          }
+        });
+        bar.addEventListener("mouseover", this._hoverMouseOverHandler, true);
+        bar.addEventListener("mousemove", this._hoverMouseMoveHandler, true);
+        bar.addEventListener("mouseout", this._hoverMouseOutHandler, true);
+      }
+      if (!this._documentPointerDownHandler) {
+        this._documentPointerDownHandler = /** @type {EventListener} */
+        ((e) => {
+          if (!document.body.classList.contains(BODY_BARTENDER_OPEN)) return;
+          const target = e.target;
+          if (!(target instanceof Node)) return;
+          const currentBar = document.querySelector(BAR_SELECTOR);
+          if (currentBar instanceof HTMLElement && currentBar.contains(target)) return;
+          if (this._panelEl && this._panelEl.contains(target)) return;
+          this._closeBartenderDrawer(true);
+        });
+        document.addEventListener("pointerdown", this._documentPointerDownHandler, true);
+      }
+      if (!this._barClickAttached) {
+        bar.addEventListener("click", (e) => {
+          if (!this._hasBartenderItems()) return;
+          const target = (
+            /** @type {HTMLElement} */
+            e.target
+          );
+          if (!target) return;
+          if (target.closest(`.${TRIGGER_CLASS}`)) return;
+          e.stopPropagation();
+          e.preventDefault();
+          this._toggleBartenderDrawer();
+        }, true);
+        this._barClickAttached = true;
+      }
+    }
+    // ── Settings panel ──────────────────────────────────────────────────────
+    _renderPanel() {
+      if (!this._panelEl) return;
+      this._panelEl.replaceChildren();
+      this._applyItems();
+      this._applyOrder();
+      const enumerated = this._enumerateRightColumn();
+      const ordered = enumerated.slice().sort((a, b) => {
+        const oa = Number(a.el.style.order) || 0;
+        const ob = Number(b.el.style.order) || 0;
+        return oa - ob;
+      });
+      this._panelEl.appendChild(panel({ pluginClass: PANEL_CLASS }, [
+        (() => {
+          const conf = typeof this.getConfiguration === "function" ? this.getConfiguration() || {} : {};
+          return pluginHeaderFromConfig(conf, { version: PLUGIN_VERSION });
+        })(),
+        section({
+          label: "Layout",
+          body: [
+            h(
+              "div",
+              { class: `${PANEL_CLASS}__align` },
+              h("div", { class: "tps-list-name" }, "Icon"),
+              this._renderTriggerIconPicker()
+            ),
+            sliderRow({
+              label: "Spacing",
+              value: this._state.spacing,
+              min: SPACING_MIN,
+              max: SPACING_MAX,
+              step: 1,
+              format: /* @__PURE__ */ __name((v) => v === 0 ? "default" : v > 0 ? `+${v}px` : `${v}px`, "format"),
+              defaultValue: 0,
+              onChange: /* @__PURE__ */ __name((v) => this._setSpacing(v), "onChange")
+            }),
+            optionRow({
+              type: "checkbox",
+              name: "sbm-icon-only-plugins",
+              label: "Icon-only plugin items",
+              checked: !!this._state.iconOnlyPlugins,
+              onChange: /* @__PURE__ */ __name((e) => this._setIconOnlyPlugins(!!/** @type {HTMLInputElement} */
+              e.target.checked), "onChange")
+            }),
+            optionRow({
+              type: "checkbox",
+              name: "sbm-icon-only-shortcuts",
+              label: "Icon-only keyboard shortcuts",
+              checked: !!this._state.iconOnlyShortcuts,
+              onChange: /* @__PURE__ */ __name((e) => this._setIconOnlyShortcuts(!!/** @type {HTMLInputElement} */
+              e.target.checked), "onChange")
+            }),
+            optionRow({
+              type: "checkbox",
+              name: "sbm-uniform-hover",
+              label: "Continuous hover highlight",
+              desc: "One highlight slides under whichever bar icon you point at, instead of each icon lighting up in its own separate box.",
+              checked: !!this._state.uniformHover,
+              onChange: /* @__PURE__ */ __name((e) => this._setUniformHover(!!/** @type {HTMLInputElement} */
+              e.target.checked), "onChange")
+            }),
+            sliderRow({
+              label: "Hover radius",
+              value: this._state.hoverRadius,
+              min: HOVER_RADIUS_MIN,
+              max: HOVER_RADIUS_MAX,
+              step: 1,
+              format: /* @__PURE__ */ __name((v) => `${v}px`, "format"),
+              defaultValue: 0,
+              onChange: /* @__PURE__ */ __name((v) => this._setHoverRadius(v), "onChange")
+            }),
+            optionRow({
+              type: "checkbox",
+              name: "sbm-split-hover-zones",
+              label: "Split hover zones left / right",
+              desc: "Left half reveals keyboard shortcuts; right half reveals plugin icons.",
+              checked: !!this._state.splitHoverZones,
+              onChange: /* @__PURE__ */ __name((e) => this._setSplitHoverZones(!!/** @type {HTMLInputElement} */
+              e.target.checked), "onChange")
+            })
+          ]
+        }),
+        section({
+          label: "Left side",
+          body: [
+            this._modeRow({
+              label: BUILTIN.shortcuts.label,
+              iconClass: this._liveIconBySelector(BUILTIN.shortcuts.selector) || BUILTIN.shortcuts.icon,
+              value: this._state.modes[BUILTIN.shortcuts.key] || this._defaultModeFor(BUILTIN.shortcuts.key),
+              options: ITEM_MODE_OPTIONS,
+              onChange: /* @__PURE__ */ __name((v) => this._setItemMode(
+                BUILTIN.shortcuts.key,
+                /** @type {ItemMode} */
+                v
+              ), "onChange")
+            })
+          ]
+        }),
+        section({
+          label: `Right side (${ordered.length})`,
+          body: [
+            this._setAllRow(ordered),
+            ...ordered.map((it) => this._modeRow({
+              label: it.label,
+              iconClass: it.iconClass,
+              value: this._state.modes[it.key] || this._defaultModeFor(it.key),
+              options: ITEM_MODE_OPTIONS,
+              onChange: /* @__PURE__ */ __name((v) => this._setItemMode(
+                it.key,
+                /** @type {ItemMode} */
+                v
+              ), "onChange"),
+              draggableKey: it.key,
+              tooltipKey: it.key
+            }))
+          ]
+        })
+      ]));
+    }
+    _renderTriggerIconPicker() {
+      const current = this._state.triggerIcon || DEFAULT_STATE.triggerIcon;
+      return h(
+        "div",
+        { class: `${PANEL_CLASS}__icon-picker` },
+        ...TRIGGER_ICON_OPTIONS.map((name) => h("button", {
+          type: "button",
+          class: `${PANEL_CLASS}__icon-btn`,
+          "aria-pressed": String(name === current),
+          "aria-label": name,
+          title: name,
+          onClick: /* @__PURE__ */ __name(() => this._setTriggerIcon(name), "onClick")
+        }, h("span", { class: `ti ti-${name}` })))
+      );
+    }
+    /**
+     * @param {{
+     *   label: string,
+     *   iconClass: string|null,
+     *   value: string,
+     *   options: {value:string,label:string}[],
+     *   onChange: (v:string) => void,
+     *   modeDisabled?: boolean,
+     *   draggableKey?: string | null,
+     *   tooltipKey?: string | null,
+     * }} args
+     */
+    _modeRow({ label, iconClass, value, options, onChange, modeDisabled, draggableKey, tooltipKey }) {
+      const icon = iconClass ? h("span", { class: `${PANEL_CLASS}__row-icon ti ${iconClass}` }) : h("span", { class: `${PANEL_CLASS}__row-icon ${PANEL_CLASS}__row-icon--blank` });
+      const modeCtrl = modeDisabled ? h("span", { class: `${PANEL_CLASS}__row-icon ${PANEL_CLASS}__row-icon--blank`, style: { width: "auto" } }, "\u2014") : tabs({ options, value, onChange });
+      if (!modeDisabled && modeCtrl instanceof HTMLElement) {
+        const btns = modeCtrl.querySelectorAll(".tps-tab");
+        options.forEach((opt, i) => {
+          const btn = btns[i];
+          if (btn instanceof HTMLElement) btn.setAttribute("data-sbm-mode-opt", opt.value);
+        });
+      }
+      const dragHandle = draggableKey ? h("div", {
+        role: "button",
+        tabIndex: 0,
+        class: `${PANEL_CLASS}__drag-handle`,
+        draggable: "true",
+        "aria-label": "Drag to reorder",
+        title: "Drag to reorder"
+      }, h(
+        "span",
+        { class: `${PANEL_CLASS}__drag-grip` },
+        h("span"),
+        h("span"),
+        h("span"),
+        h("span"),
+        h("span"),
+        h("span")
+      )) : null;
+      const tooltipExpanded = !!tooltipKey && (this._state.overrideTooltips || !!this._tooltipEditRows?.has(tooltipKey));
+      const tooltipToggle = tooltipKey ? h("button", {
+        type: "button",
+        class: `${PANEL_CLASS}__tooltip-toggle`,
+        "aria-pressed": String(tooltipExpanded),
+        "aria-label": "Edit tooltip",
+        title: "Edit tooltip",
+        onClick: /* @__PURE__ */ __name(() => this._toggleTooltipEdit(tooltipKey), "onClick")
+      }, h("span", { class: "ti ti-pencil" })) : null;
+      const controls = h(
+        "div",
+        { class: `${PANEL_CLASS}__row-controls` },
+        modeCtrl,
+        tooltipToggle,
+        dragHandle
+      );
+      let nameSlot = (
+        /** @type {Node | string} */
+        label
+      );
+      if (tooltipExpanded) {
+        const overrides = this._state.tooltipOverrides || {};
+        const currentValue = overrides[tooltipKey] !== void 0 ? overrides[tooltipKey] : this._defaultTooltipFor(tooltipKey) || "";
+        const input = h("input", {
+          type: "text",
+          class: `${PANEL_CLASS}__tooltip-input`,
+          value: currentValue,
+          placeholder: this._defaultTooltipFor(tooltipKey) || "Tooltip text",
+          onInput: /* @__PURE__ */ __name((e) => {
+            const v = (
+              /** @type {HTMLInputElement} */
+              e.target.value
+            );
+            this._setTooltipOverride(tooltipKey, v);
+          }, "onInput")
+        });
+        nameSlot = h(
+          "div",
+          { class: `${PANEL_CLASS}__name-stack` },
+          h("div", { class: `${PANEL_CLASS}__row-label` }, label),
+          input
+        );
+      }
+      const row = listRow({ icon, name: nameSlot, controls });
+      if (row instanceof HTMLElement) {
+        row.dataset.sbmRowMode = value;
+        if (tooltipExpanded) row.dataset.sbmHasTooltip = "true";
+        if (draggableKey) {
+          row.dataset.sbmRowKey = draggableKey;
+          this._wireDragRow(row, dragHandle, draggableKey);
+        }
+      }
+      return row;
+    }
+    /**
+     * Column-header row for the Right side. Its mode buttons sit directly above
+     * each item's buttons and set every item at once; the pencil is the global
+     * tooltip-edit toggle (formerly the "Override every tooltip" checkbox). No
+     * text label — it reads as the header for the columns below.
+     * @param {{ key: string }[]} items
+     */
+    _setAllRow(items) {
+      const first = items.length ? this._state.modes[items[0].key] || this._defaultModeFor(items[0].key) : "";
+      const allSame = items.length > 0 && items.every((it) => (this._state.modes[it.key] || this._defaultModeFor(it.key)) === first);
+      const modeCtrl = tabs({
+        options: ITEM_MODE_OPTIONS,
+        value: allSame ? first : "",
+        onChange: /* @__PURE__ */ __name((v) => this._setAllRightMode(
+          /** @type {ItemMode} */
+          v,
+          items
+        ), "onChange")
+      });
+      if (modeCtrl instanceof HTMLElement) {
+        const btns = modeCtrl.querySelectorAll(".tps-tab");
+        ITEM_MODE_OPTIONS.forEach((opt, i) => {
+          const btn = btns[i];
+          if (btn instanceof HTMLElement) btn.setAttribute("data-sbm-mode-opt", opt.value);
+        });
+      }
+      const allOn = !!this._state.overrideTooltips;
+      const globalPencil = h("button", {
+        type: "button",
+        class: `${PANEL_CLASS}__tooltip-toggle`,
+        "aria-pressed": String(allOn),
+        "aria-label": "Edit every tooltip",
+        title: "Edit every tooltip",
+        onClick: /* @__PURE__ */ __name(() => this._setOverrideTooltips(!allOn), "onClick")
+      }, h("span", { class: "ti ti-pencil" }));
+      const dragSpacer = h("div", { class: `${PANEL_CLASS}__drag-spacer`, "aria-hidden": "true" });
+      const controls = h("div", { class: `${PANEL_CLASS}__row-controls` }, modeCtrl, globalPencil, dragSpacer);
+      const icon = h("span", { class: `${PANEL_CLASS}__row-icon ${PANEL_CLASS}__row-icon--blank` });
+      const row = listRow({ icon, name: "", controls });
+      if (row instanceof HTMLElement) row.dataset.sbmSetAll = "true";
+      return row;
+    }
+    /**
+     * Apply one mode to every right-column item at once.
+     * @param {ItemMode} value @param {{ key: string }[]} items
+     */
+    _setAllRightMode(value, items) {
+      if (!Object.values(MODES).includes(value)) return;
+      const modes = { ...this._state.modes || {} };
+      for (const it of items) modes[it.key] = value;
+      this._state = { ...this._state, modes };
+      this._saveState();
+      this._applyItems();
+      if (!this._hasBartenderItems()) this._closeBartenderDrawer(false);
+      this._renderPanel();
+    }
+    /**
+     * Toggle the per-row tooltip editor open/closed. Transient UI state only —
+     * not persisted. Re-renders so the input appears/disappears.
+     * @param {string} key
+     */
+    _toggleTooltipEdit(key) {
+      if (!this._tooltipEditRows) this._tooltipEditRows = /* @__PURE__ */ new Set();
+      if (this._tooltipEditRows.has(key)) this._tooltipEditRows.delete(key);
+      else this._tooltipEditRows.add(key);
+      this._renderPanel();
+    }
+    /**
+     * Default tooltip text for a given key — used as the placeholder/fallback
+     * when overrideTooltips is on. Falls back to the discovered short label.
+     * @param {string} key
+     */
+    _defaultTooltipFor(key) {
+      if (key === TRIGGER_KEY) return "Status Bar Manager";
+      const builtin = BUILTIN[
+        /** @type {keyof typeof BUILTIN} */
+        key
+      ];
+      if (builtin && builtin.tooltip) return builtin.tooltip;
+      for (const item of this._discoverPluginItems()) {
+        if (item.key === key) {
+          return this._shortLabel(item.el.getAttribute("data-tooltip") || "") || item.label;
+        }
+      }
+      return "";
+    }
+    /**
+     * Native HTML5 drag/drop on a row. Drag handle is the only `draggable`
+     * surface; drop targets are sibling rows. On drop, we move the source
+     * key to before/after the target depending on cursor Y within the row.
+     *
+     * @param {HTMLElement} row
+     * @param {HTMLElement | null} handle
+     * @param {string} key
+     */
+    _wireDragRow(row, handle, key) {
+      if (!handle) return;
+      handle.addEventListener("dragstart", (e) => {
+        if (e.dataTransfer) {
+          e.dataTransfer.setData("text/plain", key);
+          e.dataTransfer.effectAllowed = "move";
+          try {
+            e.dataTransfer.setDragImage(row, 12, 12);
+          } catch {
+          }
+        }
+        row.classList.add("is-drag-source");
+        handle.classList.add("is-dragging");
+      });
+      handle.addEventListener("dragend", () => {
+        row.classList.remove("is-drag-source");
+        handle.classList.remove("is-dragging");
+        if (this._panelEl) {
+          for (const el of this._panelEl.querySelectorAll(".is-drop-above, .is-drop-below")) {
+            el.classList.remove("is-drop-above", "is-drop-below");
+          }
+        }
+      });
+      row.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+        const rect = row.getBoundingClientRect();
+        const above = e.clientY - rect.top < rect.height / 2;
+        row.classList.toggle("is-drop-above", above);
+        row.classList.toggle("is-drop-below", !above);
+      });
+      row.addEventListener("dragleave", () => {
+        row.classList.remove("is-drop-above", "is-drop-below");
+      });
+      row.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const sourceKey = e.dataTransfer && e.dataTransfer.getData("text/plain");
+        row.classList.remove("is-drop-above", "is-drop-below");
+        if (!sourceKey || sourceKey === key) return;
+        const rect = row.getBoundingClientRect();
+        const dropBefore = e.clientY - rect.top < rect.height / 2;
+        this._moveItemTo(sourceKey, key, dropBefore);
+      });
+    }
+    // ── State setters ───────────────────────────────────────────────────────
+    /** @param {number} value */
+    _setSpacing(value) {
+      const v = Math.max(SPACING_MIN, Math.min(SPACING_MAX, Number(value) || 0));
+      this._state = { ...this._state, spacing: v };
+      this._saveState();
+      this._applySpacing();
+    }
+    /** @param {boolean} value */
+    _setIconOnlyPlugins(value) {
+      this._state = { ...this._state, iconOnlyPlugins: !!value };
+      this._saveState();
+      this._applyIconOnly();
+      this._renderPanel();
+    }
+    /** @param {boolean} value */
+    _setIconOnlyShortcuts(value) {
+      this._state = { ...this._state, iconOnlyShortcuts: !!value };
+      this._saveState();
+      this._applyIconOnly();
+      this._renderPanel();
+    }
+    /** @param {string} name */
+    _setTriggerIcon(name) {
+      if (!TRIGGER_ICON_OPTIONS.includes(name)) return;
+      this._state = { ...this._state, triggerIcon: name };
+      this._saveState();
+      if (this._statusItem && this._statusItem.setIcon) {
+        try {
+          this._statusItem.setIcon(name);
+        } catch {
+        }
+      }
+      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
+      if (triggerEl) {
+        const iconEl = triggerEl.querySelector(".statusbar-item--icon");
+        if (iconEl instanceof HTMLElement) {
+          const cleaned = iconEl.className.replace(/\bti-[a-z0-9-]+/g, "").replace(/\s+/g, " ").trim();
+          iconEl.className = `${cleaned} ti-${name}`.trim();
+          if (!iconEl.classList.contains("ti")) iconEl.classList.add("ti");
+        }
+      }
+      this._renderPanel();
+    }
+    /** @param {boolean} value */
+    _setUniformHover(value) {
+      this._state = { ...this._state, uniformHover: !!value };
+      this._saveState();
+      this._applyUniformHover();
+      this._renderPanel();
+    }
+    /** @param {number} value */
+    _setHoverRadius(value) {
+      const v = Math.max(HOVER_RADIUS_MIN, Math.min(HOVER_RADIUS_MAX, Math.round(Number(value) || 0)));
+      this._state = { ...this._state, hoverRadius: v };
+      this._saveState();
+      this._applyHoverRadius();
+    }
+    /** @param {boolean} value */
+    _setSplitHoverZones(value) {
+      this._state = { ...this._state, splitHoverZones: !!value };
+      this._saveState();
+      this._applySplitHoverZones();
+      this._clearHoverSide(false);
+      this._renderPanel();
+    }
+    /** @param {boolean} value */
+    _setOverrideTooltips(value) {
+      this._state = { ...this._state, overrideTooltips: !!value };
+      this._saveState();
+      this._ensureTooltips();
+      this._renderPanel();
+    }
+    /** @param {string} key @param {string} text */
+    _setTooltipOverride(key, text) {
+      const next = { ...this._state.tooltipOverrides || {}, [key]: text };
+      this._state = { ...this._state, tooltipOverrides: next };
+      this._saveState();
+      this._ensureTooltips();
+    }
+    /** @param {string} key @param {ItemMode} value */
+    _setItemMode(key, value) {
+      if (!Object.values(MODES).includes(value)) return;
+      const modes = { ...this._state.modes || {}, [key]: value };
+      this._state = { ...this._state, modes };
+      this._saveState();
+      this._applyItems();
+      if (!this._hasBartenderItems()) {
+        this._closeBartenderDrawer(false);
+      }
+      this._renderPanel();
+    }
+    /**
+     * Move `sourceKey` to land before/after `targetKey` in the right-column
+     * ordering. Rebuilds the entire order map from the current sort, removes
+     * the source from its position, re-inserts it relative to the target,
+     * then re-normalises 0..N-1.
+     *
+     * @param {string} sourceKey
+     * @param {string} targetKey
+     * @param {boolean} dropBefore  true → insert before target; false → after
+     */
+    _moveItemTo(sourceKey, targetKey, dropBefore) {
+      if (sourceKey === targetKey) return;
+      const ordered = this._enumerateRightColumn().slice().sort((a, b) => {
+        const oa = Number(a.el.style.order) || 0;
+        const ob = Number(b.el.style.order) || 0;
+        return oa - ob;
+      });
+      const keys = ordered.map((it) => it.key);
+      const fromIdx = keys.indexOf(sourceKey);
+      const targetIdx = keys.indexOf(targetKey);
+      if (fromIdx < 0 || targetIdx < 0) return;
+      keys.splice(fromIdx, 1);
+      const adjustedTarget = keys.indexOf(targetKey);
+      const insertAt = dropBefore ? adjustedTarget : adjustedTarget + 1;
+      keys.splice(insertAt, 0, sourceKey);
+      const next = {};
+      for (let i = 0; i < keys.length; i++) next[keys[i]] = i;
+      this._state = { ...this._state, order: next };
+      this._saveState();
+      this._applyOrder();
+      this._renderPanel();
+    }
+    // ── Storage (workspace-keyed) ───────────────────────────────────────────
+    _storageKey() {
+      if (!this._wsGuid) {
+        try {
+          this._wsGuid = this.getWorkspaceGuid && this.getWorkspaceGuid() || "";
+        } catch {
+          this._wsGuid = "";
+        }
+      }
+      return `${ROOT_CLASS}/${this._wsGuid || "default"}/state`;
+    }
+    /** True only for the newest live instance (see `ACTIVE_INSTANCE_KEY`). */
+    _isActiveInstance() {
+      try {
+        const active = (
+          /** @type {any} */
+          window[ACTIVE_INSTANCE_KEY]
+        );
+        return !active || active === this;
+      } catch {
+        return true;
+      }
+    }
+    /** @param {string} key @returns {boolean} */
+    _hasLocalObject(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" && Object.keys(parsed).length > 0;
+      } catch {
+        return false;
+      }
+    }
+    /** @param {string} key @returns {Record<string, any>} */
+    _loadLocalObject(key) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key) || "{}");
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+    /** @returns {Record<string, any>} */
+    _customConfig() {
+      try {
+        const conf = this.getConfiguration && this.getConfiguration();
+        const custom = conf && conf.custom;
+        return custom && typeof custom === "object" ? custom : {};
+      } catch {
+        return {};
+      }
+    }
+    _loadState() {
+      return this._normalizeState({
+        ...this._customConfig().state || {},
+        ...this._loadLocalObject(this._storageKey())
+      });
+    }
+    /** @param {any} raw @returns {SbmState} */
+    _normalizeState(raw) {
+      raw = raw && typeof raw === "object" ? raw : {};
+      return {
+        ...DEFAULT_STATE,
+        ...raw,
+        modes: { ...DEFAULT_STATE.modes, ...raw.modes || {} },
+        order: { ...raw.order || {} },
+        tooltipOverrides: { ...raw.tooltipOverrides || {} }
+      };
+    }
+    _saveState() {
+      try {
+        localStorage.setItem(this._storageKey(), JSON.stringify(this._state));
+      } catch {
+      }
+    }
+    /** Sync state up to synced config now (best-effort). Reloads the plugin. */
+    _flushConfigSave() {
+      if (this._configSaveTimer) {
+        clearTimeout(this._configSaveTimer);
+        this._configSaveTimer = null;
+      }
+      void this._saveCustomConfigNow();
+    }
+    async _saveCustomConfigNow() {
+      if (this._configSaveInFlight) {
+        this._configSaveQueued = true;
+        return;
+      }
+      this._configSaveInFlight = true;
+      try {
+        const plugin = await this._ownGlobalPlugin();
+        if (!plugin || !plugin.saveConfiguration) return;
+        const conf = plugin.getConfiguration ? plugin.getConfiguration() : this.getConfiguration();
+        const custom = conf && conf.custom && typeof conf.custom === "object" ? conf.custom : {};
+        const state = this._normalizeState(this._state);
+        if (JSON.stringify(custom.state || {}) === JSON.stringify(state)) return;
+        await plugin.saveConfiguration(configWithPluginVersion(conf, {
+          schemaVersion: 1,
+          state
+        }, PLUGIN_VERSION));
+      } catch {
+      } finally {
+        this._configSaveInFlight = false;
+        if (this._configSaveQueued) {
+          this._configSaveQueued = false;
+          this._flushConfigSave();
+        }
+      }
+    }
+    async _ownGlobalPlugin() {
+      try {
+        const ownGuid = this.getGuid && this.getGuid();
+        const plugins = await this.data.getAllGlobalPlugins();
+        return plugins.find((p) => p && p.getGuid && p.getGuid() === ownGuid) || plugins.find((p) => p && p.getName && p.getName() === "Status Bar Manager") || null;
+      } catch {
+        return null;
+      }
+    }
+  };
+  return __toCommonJS(plugin_exports);
+})();
+var Plugin = plugins.Plugin;

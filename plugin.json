@@ -1,0 +1,18 @@
+{
+	"ver": 1,
+	"name": "Status Bar Manager",
+	"icon": "adjustments",
+	"description": "Show or hide individual elements of Thymer's bottom status bar — the bar itself, keyboard shortcuts, plugin icons, the user avatar, the Thymer logo, and the sync indicator.",
+	"instructions": "Use the arrows to reorder status bar items. Set each item to Show, Hide, Hover, or Drawer to match how you want the bar to behave.",
+	"author": "@akaready",
+	"homepage": "https://akaready.com",
+	"repository": "https://github.com/akaready/thymer-status-bar-manager",
+	"coffee": "https://buymeacoffee.com/akaready",
+	"version": "1.0.0",
+	"__source_repo": "https://github.com/akaready/thymer-status-bar-manager",
+	"__source_files": {
+		"branch": "main",
+		"json": "plugin.json",
+		"js": "plugin.js"
+	}
+}
