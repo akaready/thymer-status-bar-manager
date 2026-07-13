@@ -2416,7 +2416,7 @@ ${report}
     return wrap;
   }
   __name(renderPluginHeaderHelper, "renderPluginHeaderHelper");
-  function pluginHeaderFromConfig(conf, { version, helper, helperOpen, helperDefaultOpen, onHelperToggle, killSwitch, feedback } = {}) {
+  function pluginHeaderFromConfig(conf, { version, helper, helperOpen, helperDefaultOpen, onHelperToggle, killSwitch, feedback, scope } = {}) {
     const resolvedHelper = helper ?? conf.instructions;
     return pluginHeader({
       title: conf.name || "",
@@ -2432,7 +2432,8 @@ ${report}
       repository: conf.repository,
       coffee: conf.coffee,
       killSwitch,
-      feedback
+      feedback,
+      scope
     });
   }
   __name(pluginHeaderFromConfig, "pluginHeaderFromConfig");
@@ -2738,8 +2739,215 @@ ${report}
   }
   __name(setPluginDisabled, "setPluginDisabled");
 
+  // ../../shared/plugin-settings.js
+  function createSettingsStore(plugin, {
+    slug,
+    key = "settings",
+    version,
+    normalize = /* @__PURE__ */ __name((raw) => raw && typeof raw === "object" ? raw : {}, "normalize"),
+    scopeKey = null,
+    readSynced = null,
+    pickSynced = null
+  }) {
+    const readSyncedBlob = readSynced || ((custom) => custom?.[key]);
+    const pickSyncedSubset = pickSynced || ((s) => s);
+    let current = {};
+    let diverged = false;
+    let pushInFlight = false;
+    const workspaceGuid = /* @__PURE__ */ __name(() => {
+      try {
+        const guid = plugin.getWorkspaceGuid?.();
+        if (guid) return guid;
+      } catch {
+      }
+      return "default";
+    }, "workspaceGuid");
+    const storageKey = /* @__PURE__ */ __name(() => {
+      const scope = scopeKey ? `/${scopeKey()}` : "";
+      return `${slug}/${workspaceGuid()}${scope}/settings`;
+    }, "storageKey");
+    const readCustom = /* @__PURE__ */ __name(() => {
+      try {
+        const conf = plugin.getConfiguration?.();
+        const custom = conf && conf.custom;
+        return custom && typeof custom === "object" ? (
+          /** @type {Record<string, unknown>} */
+          custom
+        ) : {};
+      } catch {
+        return {};
+      }
+    }, "readCustom");
+    const readLocalRaw = /* @__PURE__ */ __name(() => {
+      try {
+        const raw = localStorage.getItem(storageKey());
+        if (raw === null) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return null;
+      }
+    }, "readLocalRaw");
+    const normalizedStringify = /* @__PURE__ */ __name((raw) => JSON.stringify(normalize(raw)), "normalizedStringify");
+    const store = {
+      /** Read-only: never writes either store. */
+      load() {
+        const local = readLocalRaw();
+        if (local !== null) {
+          current = normalize(local);
+          diverged = true;
+        } else {
+          current = normalize(readSyncedBlob(readCustom()) || {});
+          diverged = false;
+        }
+        return { settings: current, diverged };
+      },
+      get() {
+        return current;
+      },
+      isDiverged() {
+        return diverged;
+      },
+      /**
+       * Every edit is device-local. First edit snapshots the FULL settings
+       * (inherited values of untouched keys survive). localStorage throwing
+       * (private mode) leaves the edit in memory for the session — still
+       * reported diverged so the pill/push UI works, and push still syncs.
+       */
+      update(patch) {
+        current = normalize({ ...current, ...patch });
+        if (normalizedStringify(readSyncedBlob(readCustom())) === JSON.stringify(current)) {
+          try {
+            localStorage.removeItem(storageKey());
+          } catch {
+          }
+          diverged = false;
+          return { settings: current, diverged };
+        }
+        diverged = true;
+        try {
+          localStorage.setItem(storageKey(), JSON.stringify(current));
+        } catch {
+        }
+        return { settings: current, diverged };
+      },
+      /**
+       * The explicit ↑ "Apply to all devices": ONE saveConfiguration (which
+       * reloads the plugin), then the local blob is cleared so this device
+       * goes back to following the synced config. Resolves true when the
+       * settings are known to be in synced config (pushed or already equal).
+       */
+      async pushToAll() {
+        if (pushInFlight) return false;
+        pushInFlight = true;
+        try {
+          const api = await resolveConfigApi(plugin);
+          if (!api || typeof api.saveConfiguration !== "function") return false;
+          let conf = {};
+          try {
+            conf = api.getConfiguration?.() || plugin.getConfiguration?.() || {};
+          } catch {
+            return false;
+          }
+          if (typeof conf.name !== "string" || !conf.name.trim()) return false;
+          const custom = conf.custom && typeof conf.custom === "object" ? conf.custom : {};
+          const subset = pickSyncedSubset(normalize(current));
+          try {
+            localStorage.removeItem(storageKey());
+          } catch {
+          }
+          diverged = false;
+          try {
+            if (normalizedStringify(readSyncedBlob(
+              /** @type {any} */
+              custom
+            )) !== normalizedStringify(subset)) {
+              await api.saveConfiguration(configWithPluginVersion(conf, { [key]: subset }, version));
+            }
+          } catch (err) {
+            try {
+              localStorage.setItem(storageKey(), JSON.stringify(current));
+            } catch {
+            }
+            diverged = true;
+            throw err;
+          }
+          return true;
+        } catch {
+          return false;
+        } finally {
+          pushInFlight = false;
+        }
+      },
+      /** The ↺ "Discard device changes": drop local, re-adopt synced. */
+      discardLocal() {
+        try {
+          localStorage.removeItem(storageKey());
+        } catch {
+        }
+        current = normalize(readSyncedBlob(readCustom()) || {});
+        diverged = false;
+        return current;
+      },
+      /**
+       * For folding into `setPluginDisabled(plugin, off, version, customPatch)`
+       * so a kill-switch toggle carries staged device settings in the SAME
+       * save (one reload, no race — CLAUDE.md rule). Call markFlushed() after
+       * that save succeeds if the fold should count as a push.
+       */
+      pendingCustomPatch() {
+        return diverged ? { [key]: pickSyncedSubset(normalize(current)) } : {};
+      },
+      markFlushed() {
+        try {
+          localStorage.removeItem(storageKey());
+        } catch {
+        }
+        diverged = false;
+      },
+      /**
+       * Live-follow for non-diverged devices: when another device pushes,
+       * `global-plugin.updated` fires here; re-read the synced blob and, if
+       * it changed semantically, hand the fresh settings to the plugin's
+       * central apply (which each plugin already guards with its kill
+       * switch). Returns a detach function for onUnload.
+       */
+      attachLifecycle({ onRemoteChange } = {}) {
+        const handlerIds = [];
+        try {
+          const id = plugin.events?.on?.("global-plugin.updated", (event) => {
+            try {
+              if (diverged) return;
+              if (event?.source?.isLocal) return;
+              const guid = plugin.getGuid?.();
+              const eventGuid = event?.pluginGuid || event?.guid || event?.rootId || null;
+              if (eventGuid && guid && eventGuid !== guid) return;
+              const next = normalize(readSyncedBlob(readCustom()) || {});
+              if (JSON.stringify(next) === JSON.stringify(current)) return;
+              current = next;
+              onRemoteChange?.(current);
+            } catch {
+            }
+          });
+          if (id) handlerIds.push(id);
+        } catch {
+        }
+        return () => {
+          for (const id of handlerIds) {
+            try {
+              plugin.events?.off?.(id);
+            } catch {
+            }
+          }
+        };
+      }
+    };
+    return store;
+  }
+  __name(createSettingsStore, "createSettingsStore");
+
   // plugin.js
-  var PLUGIN_VERSION = "1.1.6";
+  var PLUGIN_VERSION = "1.2.0";
   var ROOT_CLASS = "plg-status-bar-manager";
   var PANEL_CLASS = `${ROOT_CLASS}-panel`;
   var TRIGGER_CLASS = "plg-sbm-trigger";
@@ -2924,6 +3132,17 @@ ${report}
     static {
       __name(this, "Plugin");
     }
+    /**
+     * Class-field declarations (not a constructor override — the SDK injects
+     * context after construction; onLoad replaces both values before use).
+     * @type {SbmState}
+     */
+    _state = DEFAULT_STATE;
+    /** @type {ReturnType<typeof createSettingsStore>} */
+    _settingsStore = (
+      /** @type {any} */
+      null
+    );
     onLoad() {
       pingInstall("status-bar-manager");
       pingActive("status-bar-manager");
@@ -2942,28 +3161,22 @@ ${report}
       this._documentPointerDownHandler = null;
       this._hoverCloseTimer = null;
       this._bartenderCloseTimer = null;
-      this._configSaveTimer = null;
-      this._configSaveInFlight = false;
-      this._configSaveQueued = false;
       this._renderRaf = 0;
       this._panelOpenPromise = null;
-      this._wsGuid = null;
       this._tooltipEditRows = /* @__PURE__ */ new Set();
       try {
         /** @type {any} */
         window[ACTIVE_INSTANCE_KEY] = this;
       } catch {
       }
-      this._state = this._loadState();
-      this._handlerIds.push(this.events.on("panel.closed", (e) => {
-        try {
-          const p = e && e.panel;
-          if (p && typeof p.getType === "function" && p.getType() === PANEL_TYPE) {
-            this._flushConfigSave();
-          }
-        } catch {
-        }
-      }));
+      this._settingsStore = createSettingsStore(this, {
+        slug: "status-bar-manager",
+        key: "state",
+        version: PLUGIN_VERSION,
+        normalize: /* @__PURE__ */ __name((raw) => this._normalizeState(raw), "normalize")
+      });
+      this._state = /** @type {SbmState} */
+      this._settingsStore.load().settings;
       this.ui.injectCSS(PANEL_CSS);
       this._injectStaticCSS();
       this._statusItem = this.ui.addStatusBarItem({
@@ -2998,6 +3211,14 @@ ${report}
         this._panelEl = el2;
         this._renderPanel();
       });
+      this._detachSettingsLifecycle = this._settingsStore.attachLifecycle({
+        onRemoteChange: /* @__PURE__ */ __name((state) => {
+          this._state = /** @type {SbmState} */
+          state;
+          this._applyAll();
+          this._renderPanel();
+        }, "onRemoteChange")
+      });
       try {
         const staleRoot = document.querySelector(".plg-status-bar-manager-panel");
         if (staleRoot && staleRoot.parentElement) {
@@ -3007,12 +3228,7 @@ ${report}
       } catch {
       }
       if (this._disabled) return;
-      this._applySpacing();
-      this._applyIconOnly();
-      this._applyHoverRadius();
-      this._applyUniformHover();
-      this._applySplitHoverZones();
-      this._scheduleApplyItems();
+      this._applyAll();
       this._observeBar();
     }
     onUnload() {
@@ -3051,7 +3267,10 @@ ${report}
         clearTimeout(this._bartenderCloseTimer);
         this._bartenderCloseTimer = null;
       }
-      this._flushConfigSave();
+      try {
+        this._detachSettingsLifecycle?.();
+      } catch {
+      }
       if (this._hoverOverlayEl) {
         this._hoverOverlayEl.remove();
         this._hoverOverlayEl = null;
@@ -3705,6 +3924,44 @@ ${report}
     // ── Apply state to the live DOM ─────────────────────────────────────────
     // Every _apply* early-outs while the kill switch is off so panel edits made
     // in the disabled state can't leak effects into the bar.
+    /**
+     * Re-apply the whole state to the live bar — used at load and whenever the
+     * device adopts a different blob wholesale (remote push, discard). Each
+     * _apply* guards the kill switch itself.
+     */
+    _applyAll() {
+      this._applySpacing();
+      this._applyIconOnly();
+      this._applyHoverRadius();
+      this._applyUniformHover();
+      this._applySplitHoverZones();
+      this._applyTriggerIcon();
+      this._scheduleApplyItems();
+      if (!this._hasBartenderItems()) this._closeBartenderDrawer(false);
+    }
+    /**
+     * Sync the trigger's icon to `state.triggerIcon`. Deliberately NOT gated on
+     * the kill switch: the trigger stays visible while disabled (it's a settings
+     * entry point), so its icon should track the setting live.
+     */
+    _applyTriggerIcon() {
+      const name = this._state.triggerIcon || DEFAULT_STATE.triggerIcon;
+      if (this._statusItem && this._statusItem.setIcon) {
+        try {
+          this._statusItem.setIcon(name);
+        } catch {
+        }
+      }
+      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
+      if (triggerEl) {
+        const iconEl = triggerEl.querySelector(".statusbar-item--icon");
+        if (iconEl instanceof HTMLElement) {
+          const cleaned = iconEl.className.replace(/\bti-[a-z0-9-]+/g, "").replace(/\s+/g, " ").trim();
+          iconEl.className = `${cleaned} ti-${name}`.trim();
+          if (!iconEl.classList.contains("ti")) iconEl.classList.add("ti");
+        }
+      }
+    }
     _applySpacing() {
       if (this._disabled) return;
       const px = Math.max(SPACING_MIN, Math.min(SPACING_MAX, Number(this._state.spacing) || 0));
@@ -3890,6 +4147,7 @@ ${report}
      * tooltip arrow is always positioned via data-tooltip-dir="top".
      */
     _ensureTooltips() {
+      if (this._disabled) return;
       const force = !!this._state.overrideTooltips;
       const overrides = this._state.tooltipOverrides || {};
       for (const def of Object.values(BUILTIN)) {
@@ -3953,6 +4211,7 @@ ${report}
       );
     }
     _applyItems() {
+      if (this._disabled) return;
       if (!this._isActiveInstance()) return;
       const bar = document.querySelector(BAR_SELECTOR);
       if (!bar) return;
@@ -3990,6 +4249,7 @@ ${report}
      * install behaves identically to Thymer's default layout.
      */
     _applyOrder() {
+      if (this._disabled) return;
       const right = document.querySelector(RIGHT_SELECTOR);
       if (!right) return;
       const items = this._enumerateRightColumn();
@@ -4101,7 +4361,7 @@ ${report}
      * One-time, best-effort migration of a plugin item's saved settings from the
      * old tooltip-derived key to the stable cid key. Only copies when the new key
      * has no value yet and the old key does, so it never clobbers newer edits.
-     * localStorage-only (no reload).
+     * Device-local (store.update — no reload).
      * @param {string} oldKey @param {string} newKey
      */
     _migrateItemKey(oldKey, newKey) {
@@ -4110,15 +4370,18 @@ ${report}
         /** @type {Record<string, any>} */
         this._state
       );
-      let changed = false;
+      const patch = {};
       for (const bag of ["modes", "order", "tooltipOverrides"]) {
         const map = state[bag];
         if (map && map[oldKey] !== void 0 && map[newKey] === void 0) {
-          this._state = { ...this._state, [bag]: { ...map, [newKey]: map[oldKey] } };
-          changed = true;
+          patch[bag] = { ...map, [newKey]: map[oldKey] };
         }
       }
-      if (changed) this._saveState();
+      if (Object.keys(patch).length) {
+        this._state = /** @type {SbmState} */
+        this._settingsStore.update(patch).settings;
+        this._refreshScopePill();
+      }
     }
     /** @param {string} tooltip */
     _shortLabel(tooltip) {
@@ -4227,17 +4490,11 @@ ${report}
           const conf = typeof this.getConfiguration === "function" ? this.getConfiguration() || {} : {};
           return pluginHeaderFromConfig(conf, {
             version: PLUGIN_VERSION,
+            scope: this._scopeArgs(),
             killSwitch: {
               on: !this._disabled,
               onToggle: /* @__PURE__ */ __name((nextOn) => {
-                if (this._configSaveTimer) {
-                  clearTimeout(this._configSaveTimer);
-                  this._configSaveTimer = null;
-                }
-                void setPluginDisabled(this, !nextOn, PLUGIN_VERSION, {
-                  schemaVersion: 1,
-                  state: this._normalizeState(this._state)
-                });
+                void setPluginDisabled(this, !nextOn, PLUGIN_VERSION);
               }, "onToggle")
             },
             feedback: { data: this.data }
@@ -4503,8 +4760,8 @@ ${report}
       if (!Object.values(MODES).includes(value)) return;
       const modes = { ...this._state.modes || {} };
       for (const it of items) modes[it.key] = value;
-      this._state = { ...this._state, modes };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ modes }).settings;
       this._applyItems();
       if (!this._hasBartenderItems()) this._closeBartenderDrawer(false);
       this._renderPanel();
@@ -4593,91 +4850,83 @@ ${report}
       });
     }
     // ── State setters ───────────────────────────────────────────────────────
+    // Every edit routes through the store (device-local, auto-reconverging),
+    // then applies to the live bar. Live drag/typing paths (sliders, tooltip
+    // inputs) must not full-re-render — they refresh only the scope pill.
     /** @param {number} value */
     _setSpacing(value) {
       const v = Math.max(SPACING_MIN, Math.min(SPACING_MAX, Number(value) || 0));
-      this._state = { ...this._state, spacing: v };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ spacing: v }).settings;
       this._applySpacing();
+      this._refreshScopePill();
     }
     /** @param {boolean} value */
     _setIconOnlyPlugins(value) {
-      this._state = { ...this._state, iconOnlyPlugins: !!value };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ iconOnlyPlugins: !!value }).settings;
       this._applyIconOnly();
       this._renderPanel();
     }
     /** @param {boolean} value */
     _setIconOnlyShortcuts(value) {
-      this._state = { ...this._state, iconOnlyShortcuts: !!value };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ iconOnlyShortcuts: !!value }).settings;
       this._applyIconOnly();
       this._renderPanel();
     }
     /** @param {string} name */
     _setTriggerIcon(name) {
       if (!TRIGGER_ICON_OPTIONS.includes(name)) return;
-      this._state = { ...this._state, triggerIcon: name };
-      this._saveState();
-      if (this._statusItem && this._statusItem.setIcon) {
-        try {
-          this._statusItem.setIcon(name);
-        } catch {
-        }
-      }
-      const triggerEl = this._statusItem && this._statusItem.getElement && this._statusItem.getElement();
-      if (triggerEl) {
-        const iconEl = triggerEl.querySelector(".statusbar-item--icon");
-        if (iconEl instanceof HTMLElement) {
-          const cleaned = iconEl.className.replace(/\bti-[a-z0-9-]+/g, "").replace(/\s+/g, " ").trim();
-          iconEl.className = `${cleaned} ti-${name}`.trim();
-          if (!iconEl.classList.contains("ti")) iconEl.classList.add("ti");
-        }
-      }
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ triggerIcon: name }).settings;
+      this._applyTriggerIcon();
       this._renderPanel();
     }
     /** @param {boolean} value */
     _setUniformHover(value) {
-      this._state = { ...this._state, uniformHover: !!value };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ uniformHover: !!value }).settings;
       this._applyUniformHover();
       this._renderPanel();
     }
     /** @param {number} value */
     _setHoverRadius(value) {
       const v = Math.max(HOVER_RADIUS_MIN, Math.min(HOVER_RADIUS_MAX, Math.round(Number(value) || 0)));
-      this._state = { ...this._state, hoverRadius: v };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ hoverRadius: v }).settings;
       this._applyHoverRadius();
+      this._refreshScopePill();
     }
     /** @param {boolean} value */
     _setSplitHoverZones(value) {
-      this._state = { ...this._state, splitHoverZones: !!value };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ splitHoverZones: !!value }).settings;
       this._applySplitHoverZones();
       this._clearHoverSide(false);
       this._renderPanel();
     }
     /** @param {boolean} value */
     _setOverrideTooltips(value) {
-      this._state = { ...this._state, overrideTooltips: !!value };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ overrideTooltips: !!value }).settings;
       this._ensureTooltips();
       this._renderPanel();
     }
     /** @param {string} key @param {string} text */
     _setTooltipOverride(key, text) {
       const next = { ...this._state.tooltipOverrides || {}, [key]: text };
-      this._state = { ...this._state, tooltipOverrides: next };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ tooltipOverrides: next }).settings;
       this._ensureTooltips();
+      this._refreshScopePill();
     }
     /** @param {string} key @param {ItemMode} value */
     _setItemMode(key, value) {
       if (!Object.values(MODES).includes(value)) return;
       const modes = { ...this._state.modes || {}, [key]: value };
-      this._state = { ...this._state, modes };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ modes }).settings;
       this._applyItems();
       if (!this._hasBartenderItems()) {
         this._closeBartenderDrawer(false);
@@ -4711,22 +4960,48 @@ ${report}
       keys.splice(insertAt, 0, sourceKey);
       const next = {};
       for (let i = 0; i < keys.length; i++) next[keys[i]] = i;
-      this._state = { ...this._state, order: next };
-      this._saveState();
+      this._state = /** @type {SbmState} */
+      this._settingsStore.update({ order: next }).settings;
       this._applyOrder();
       this._renderPanel();
     }
-    // ── Storage (workspace-keyed) ───────────────────────────────────────────
-    _storageKey() {
-      if (!this._wsGuid) {
-        try {
-          this._wsGuid = this.getWorkspaceGuid && this.getWorkspaceGuid() || "";
-        } catch {
-          this._wsGuid = "";
-        }
-      }
-      return `${ROOT_CLASS}/${this._wsGuid || "default"}/state`;
+    // ── Settings scope (per-device store) ───────────────────────────────────
+    /**
+     * Scope-cluster wiring for the header pill: push = one saveConfiguration
+     * (the reload's hot-reload heal re-renders the panel); discard = two-tap
+     * armed in the shared cluster, then re-adopt synced values here.
+     */
+    _scopeArgs() {
+      return {
+        diverged: this._settingsStore.isDiverged(),
+        onPush: /* @__PURE__ */ __name(() => {
+          void this._settingsStore.pushToAll().then((ok) => {
+            if (!ok) return;
+            try {
+              this.ui.addToaster({ title: "Status Bar Manager", message: "Settings applied to all devices", dismissible: true, autoDestroyTime: 3e3 });
+            } catch {
+            }
+            this._refreshScopePill();
+          });
+        }, "onPush"),
+        onDiscard: /* @__PURE__ */ __name(() => {
+          this._state = /** @type {SbmState} */
+          this._settingsStore.discardLocal();
+          this._applyAll();
+          this._renderPanel();
+          try {
+            this.ui.addToaster({ title: "Status Bar Manager", message: "Reverted to synced settings", dismissible: true, autoDestroyTime: 3e3 });
+          } catch {
+          }
+        }, "onDiscard")
+      };
     }
+    /** Swap just the pill cluster — never nukes inputs mid-edit. */
+    _refreshScopePill() {
+      const el2 = this._panelEl?.querySelector?.(".tps-scope");
+      if (el2) el2.replaceWith(scopeCluster(this._scopeArgs()));
+    }
+    // ── State normalization ─────────────────────────────────────────────────
     /** True only for the newest live instance (see `ACTIVE_INSTANCE_KEY`). */
     _isActiveInstance() {
       try {
@@ -4739,104 +5014,59 @@ ${report}
         return true;
       }
     }
-    /** @param {string} key @returns {boolean} */
-    _hasLocalObject(key) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return false;
-        const parsed = JSON.parse(raw);
-        return parsed && typeof parsed === "object" && Object.keys(parsed).length > 0;
-      } catch {
-        return false;
-      }
-    }
-    /** @param {string} key @returns {Record<string, any>} */
-    _loadLocalObject(key) {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(key) || "{}");
-        return parsed && typeof parsed === "object" ? parsed : {};
-      } catch {
-        return {};
-      }
-    }
-    /** @returns {Record<string, any>} */
-    _customConfig() {
-      try {
-        const conf = this.getConfiguration && this.getConfiguration();
-        const custom = conf && conf.custom;
-        return custom && typeof custom === "object" ? custom : {};
-      } catch {
-        return {};
-      }
-    }
-    _loadState() {
-      return this._normalizeState({
-        ...this._customConfig().state || {},
-        ...this._loadLocalObject(this._storageKey())
-      });
-    }
-    /** @param {any} raw @returns {SbmState} */
+    /**
+     * Normalizer for the settings store: idempotent, junk-tolerant, and emits a
+     * FIXED top-level key set/order/types — both sides of every convergence
+     * compare run through it, so map keys are sorted and every value is coerced
+     * to its declared type. Schema migration lives here too: the legacy synced
+     * blob's sibling `custom.schemaVersion` was write-only (nothing ever read
+     * it), so the defaults-spread below IS the whole migration path, and any
+     * stray key in a raw blob is dropped by the fixed key set.
+     * @param {any} raw @returns {SbmState}
+     */
     _normalizeState(raw) {
       raw = raw && typeof raw === "object" ? raw : {};
+      const bool = /* @__PURE__ */ __name((v, dflt) => v === void 0 ? dflt : !!v, "bool");
+      const int = /* @__PURE__ */ __name((v, dflt, min, max) => {
+        const n = Math.round(Number(v));
+        return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : dflt;
+      }, "int");
+      const modeValues = (
+        /** @type {string[]} */
+        Object.values(MODES)
+      );
+      const modes = {};
+      const rawModes = raw.modes && typeof raw.modes === "object" ? raw.modes : {};
+      const modeKeys = [.../* @__PURE__ */ new Set([...Object.keys(DEFAULT_STATE.modes), ...Object.keys(rawModes)])].sort();
+      for (const k of modeKeys) {
+        const v = modeValues.includes(rawModes[k]) ? rawModes[k] : DEFAULT_STATE.modes[k];
+        if (v) modes[k] = /** @type {ItemMode} */
+        v;
+      }
+      const order = {};
+      const rawOrder = raw.order && typeof raw.order === "object" ? raw.order : {};
+      for (const k of Object.keys(rawOrder).sort()) {
+        const n = Number(rawOrder[k]);
+        if (Number.isFinite(n)) order[k] = n;
+      }
+      const tooltipOverrides = {};
+      const rawTips = raw.tooltipOverrides && typeof raw.tooltipOverrides === "object" ? raw.tooltipOverrides : {};
+      for (const k of Object.keys(rawTips).sort()) {
+        if (typeof rawTips[k] === "string") tooltipOverrides[k] = rawTips[k];
+      }
       return {
-        ...DEFAULT_STATE,
-        ...raw,
-        modes: { ...DEFAULT_STATE.modes, ...raw.modes || {} },
-        order: { ...raw.order || {} },
-        tooltipOverrides: { ...raw.tooltipOverrides || {} }
+        spacing: int(raw.spacing, DEFAULT_STATE.spacing, SPACING_MIN, SPACING_MAX),
+        iconOnlyPlugins: bool(raw.iconOnlyPlugins, DEFAULT_STATE.iconOnlyPlugins),
+        iconOnlyShortcuts: bool(raw.iconOnlyShortcuts, DEFAULT_STATE.iconOnlyShortcuts),
+        uniformHover: bool(raw.uniformHover, DEFAULT_STATE.uniformHover),
+        hoverRadius: int(raw.hoverRadius, DEFAULT_STATE.hoverRadius, HOVER_RADIUS_MIN, HOVER_RADIUS_MAX),
+        splitHoverZones: bool(raw.splitHoverZones, DEFAULT_STATE.splitHoverZones),
+        overrideTooltips: bool(raw.overrideTooltips, DEFAULT_STATE.overrideTooltips),
+        triggerIcon: typeof raw.triggerIcon === "string" && raw.triggerIcon ? raw.triggerIcon : DEFAULT_STATE.triggerIcon,
+        tooltipOverrides,
+        modes,
+        order
       };
-    }
-    _saveState() {
-      try {
-        localStorage.setItem(this._storageKey(), JSON.stringify(this._state));
-      } catch {
-      }
-    }
-    /** Sync state up to synced config now (best-effort). Reloads the plugin. */
-    _flushConfigSave() {
-      if (this._configSaveTimer) {
-        clearTimeout(this._configSaveTimer);
-        this._configSaveTimer = null;
-      }
-      void this._saveCustomConfigNow();
-    }
-    async _saveCustomConfigNow() {
-      if (this._configSaveInFlight) {
-        this._configSaveQueued = true;
-        return;
-      }
-      this._configSaveInFlight = true;
-      try {
-        const plugin = await this._ownGlobalPlugin();
-        if (!plugin || !plugin.saveConfiguration) return;
-        const conf = plugin.getConfiguration ? plugin.getConfiguration() : this.getConfiguration();
-        const custom = conf && conf.custom && typeof conf.custom === "object" ? conf.custom : {};
-        const state = this._normalizeState(this._state);
-        if (JSON.stringify(custom.state || {}) === JSON.stringify(state)) return;
-        await plugin.saveConfiguration(
-          /** @type {any} */
-          configWithPluginVersion(conf, {
-            schemaVersion: 1,
-            state
-          }, PLUGIN_VERSION)
-        );
-      } catch {
-      } finally {
-        this._configSaveInFlight = false;
-        if (this._configSaveQueued) {
-          this._configSaveQueued = false;
-          this._flushConfigSave();
-        }
-      }
-    }
-    async _ownGlobalPlugin() {
-      try {
-        const ownGuid = this.getGuid && this.getGuid();
-        const plugins = await this.data.getAllGlobalPlugins();
-        return plugins.find((p) => p && p.getGuid && p.getGuid() === ownGuid) || plugins.find((p) => p && p.getName && p.getName() === "Status Bar Manager") || null;
-      } catch {
-        return null;
-      }
     }
   };
   return __toCommonJS(plugin_exports);
